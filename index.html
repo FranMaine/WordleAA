@@ -1,0 +1,1375 @@
+﻿<title>Apellidos de Alumni</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Barlow:wght@400;600;700&family=Barlow+Condensed:wght@600;700;800&family=Bebas+Neue&display=swap" rel="stylesheet">
+
+<style>
+  /* ── Single dark theme — Alumni night game ── */
+  :root {
+    --paper: #0c0906;
+    --paper-line: #2a221a;
+    --card: #1a1410;
+    --ink: #f0e4cc;
+    --ink-soft: #836f59;
+    --red: #d12030;
+    --red-deep: #8c1520;
+    --red-ink: #f5ede0;
+    --correct: #3a9e2f;
+    --correct-ink: #d0f0cc;
+    --gold: #c4882a;
+    --gold-ink: #f5ecd4;
+    --absent: #2e2820;
+    --absent-ink: #c8baa8;
+    --tile-empty: #1a1410;
+    --tile-border: #382e24;
+    --focus-ring: #4e9ec8;
+    --shadow: 0 1px 0 rgba(0,0,0,0.6), 0 8px 24px -12px rgba(0,0,0,0.8);
+  }
+
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  body { margin: 0; background: var(--paper); color: var(--ink); font-family: "Barlow","Helvetica Neue",sans-serif; -webkit-font-smoothing: antialiased; }
+  .page { max-width: 640px; margin: 0 auto; padding: 0 16px 64px; display: flex; flex-direction: column; gap: 28px; }
+  h1, h2, h3 { font-family: "Barlow Condensed","Anton","Arial Narrow",sans-serif; font-weight: 800; letter-spacing: 0.01em; text-wrap: balance; margin: 0; }
+  a { color: var(--red); }
+  button { font-family: inherit; }
+  :focus-visible { outline: 3px solid var(--focus-ring); outline-offset: 2px; }
+
+  .hoops { height: 10px; background: repeating-linear-gradient(90deg, var(--red) 0px, var(--red) 22px, var(--ink) 22px, var(--ink) 32px, var(--paper) 32px, var(--paper) 40px, var(--ink) 40px, var(--ink) 50px, var(--red) 50px, var(--red) 72px); border-radius: 2px; }
+
+  .masthead { padding-top: 24px; display: flex; flex-direction: column; gap: 8px; }
+  .masthead-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+  .masthead-text { flex: 1; min-width: 0; }
+  .masthead-right { display: flex; flex-direction: column; align-items: center; gap: 10px; flex-shrink: 0; padding-top: 4px; }
+  .masthead .kicker { font-size: 0.68rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink-soft); font-weight: 700; }
+  .masthead h1 { font-size: clamp(2.4rem, 10vw, 3.4rem); line-height: 0.92; color: var(--red); letter-spacing: -0.01em; }
+  .masthead h1 span { display: block; color: var(--ink-soft); font-size: 0.32em; margin-top: 8px; letter-spacing: 0.22em; text-transform: uppercase; font-weight: 600; }
+  .masthead p.tag { color: var(--ink-soft); font-size: 0.9rem; max-width: 52ch; line-height: 1.5; }
+  .jersey-deco { width: 58px; opacity: 0.9; filter: drop-shadow(0 4px 14px rgba(209,32,48,0.35)); }
+  .jersey-deco svg { width: 100%; height: auto; display: block; }
+  .stats-icon-btn { width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--tile-border); background: var(--card); color: var(--ink-soft); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: color 0.15s, border-color 0.15s, background 0.15s; }
+  .stats-icon-btn:hover { color: var(--red); border-color: var(--red); background: color-mix(in srgb, var(--red) 10%, var(--card)); }
+
+  .demo-banner { background: var(--card); border: 1px solid var(--tile-border); border-left: 4px solid var(--gold); border-radius: 3px; padding: 12px 14px; font-size: 0.88rem; line-height: 1.5; color: var(--ink); box-shadow: var(--shadow); }
+  .demo-banner strong { color: var(--gold); }
+
+  .team-select-wrap { display: flex; flex-direction: column; gap: 6px; }
+  .team-select-label { font-size: 0.72rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-soft); font-weight: 600; }
+  .team-select {
+    width: 100%; padding: 10px 36px 10px 14px; border-radius: 3px; border: 1px solid var(--tile-border);
+    background: var(--card); color: var(--ink); font-family: inherit; font-weight: 600; font-size: 0.9rem;
+    cursor: pointer; appearance: none; -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236d5f4c' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 12px center; box-shadow: var(--shadow);
+  }
+  .team-select:focus { outline: 3px solid var(--focus-ring); outline-offset: 2px; }
+
+  .board-wrap { display: flex; flex-direction: column; align-items: center; gap: 14px; }
+  .message { min-height: 22px; font-weight: 600; font-size: 0.9rem; text-align: center; color: var(--ink); }
+  .message.error { color: var(--red); }
+  .hints { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; min-height: 30px; }
+  .hint-chip { display: flex; align-items: baseline; gap: 5px; background: var(--card); border: 1px solid var(--tile-border); border-radius: 20px; padding: 5px 12px; font-size: 0.8rem; box-shadow: var(--shadow); animation: hint-in 0.25s ease; }
+  .hint-chip .k { font-size: 0.65rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-soft); font-weight: 700; }
+  .hint-chip .v { font-weight: 700; color: var(--gold); }
+  @keyframes hint-in { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
+  @media (prefers-reduced-motion: reduce) { .hint-chip { animation: none !important; } }
+
+  .board { display: grid; grid-template-columns: repeat(var(--cols, 6), var(--tile, 46px)); grid-auto-rows: var(--tile, 46px); gap: 7px; justify-content: center; }
+  .tile { display: flex; align-items: center; justify-content: center; font-family: "Anton",sans-serif; font-size: calc(var(--tile, 46px) * 0.46); color: var(--ink); background: var(--tile-empty); border: 2px solid var(--tile-border); border-radius: 3px; text-transform: uppercase; transition: transform 0.15s ease; }
+  .tile[data-filled="true"] { border-color: var(--ink-soft); }
+  .tile[data-state="correct"] { background: var(--correct); border-color: var(--correct); color: var(--correct-ink); }
+  .tile[data-state="present"] { background: var(--gold); border-color: var(--gold); color: var(--gold-ink); }
+  .tile[data-state="absent"] { background: var(--absent); border-color: var(--absent); color: var(--absent-ink); }
+  .tile[data-state="space"] { background: transparent; border: none; border-bottom: 2px solid var(--tile-border); }
+  .tile[data-flip="true"] { animation: flip 0.5s ease forwards; }
+  @keyframes flip { 0% { transform: rotateX(0deg); } 50% { transform: rotateX(90deg); } 100% { transform: rotateX(0deg); } }
+  .board[data-shake="true"] { animation: shake 0.4s; }
+  @keyframes shake { 10%,90% { transform: translateX(-2px); } 20%,80% { transform: translateX(4px); } 30%,50%,70% { transform: translateX(-8px); } 40%,60% { transform: translateX(8px); } }
+  @media (prefers-reduced-motion: reduce) { .tile, .board { animation: none !important; transition: none !important; } }
+
+  .keyboard { display: flex; flex-direction: column; gap: 7px; max-width: 480px; margin: 0 auto; width: 100%; }
+  .krow { display: flex; gap: 5px; justify-content: center; }
+  .key { flex: 1; min-width: 0; height: 46px; border-radius: 3px; border: none; background: var(--card); color: var(--ink); font-weight: 700; font-size: 0.85rem; box-shadow: var(--shadow); cursor: pointer; text-transform: uppercase; }
+  .key.wide { flex: 1.6; font-size: 0.68rem; letter-spacing: 0.02em; }
+  .key[data-state="correct"] { background: var(--correct); color: var(--correct-ink); }
+  .key[data-state="present"] { background: var(--gold); color: var(--gold-ink); }
+  .key[data-state="absent"] { background: var(--absent); color: var(--absent-ink); }
+  .key:active { transform: translateY(1px); }
+
+  .reveal-card { background: var(--card); border: 1px solid var(--tile-border); border-radius: 4px; padding: 18px 20px; box-shadow: var(--shadow); display: flex; flex-direction: column; gap: 10px; }
+  .reveal-card .eyebrow { font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-soft); font-weight: 700; }
+  .reveal-card h3 { font-size: 1.7rem; color: var(--red); }
+  .reveal-card .meta { color: var(--ink-soft); font-size: 0.9rem; }
+  .reveal-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 4px; }
+  .btn { border: none; border-radius: 3px; padding: 10px 16px; font-weight: 700; font-size: 0.85rem; cursor: pointer; text-transform: uppercase; letter-spacing: 0.02em; }
+  .btn.primary { background: var(--red); color: var(--red-ink); }
+  .btn.ghost { background: transparent; border: 1px solid var(--tile-border); color: var(--ink); }
+  .share-box { white-space: pre; font-family: "Karla",sans-serif; font-size: 0.85rem; background: var(--paper); border: 1px dashed var(--tile-border); border-radius: 3px; padding: 10px 12px; line-height: 1.5; display: none; }
+  .share-box[data-visible="true"] { display: block; }
+
+  .stats h2 { font-size: 1.4rem; color: var(--ink); margin-bottom: 4px; }
+  .stats p.sub { color: var(--ink-soft); font-size: 0.88rem; margin: 4px 0 14px; max-width: 56ch; line-height: 1.5; }
+  .table-scroll { overflow-x: auto; border: 1px solid var(--tile-border); border-radius: 4px; }
+  table { border-collapse: collapse; width: 100%; min-width: 360px; background: var(--card); }
+  thead th { text-align: left; font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-soft); padding: 10px 14px; border-bottom: 1px solid var(--tile-border); }
+  tbody td { padding: 10px 14px; border-bottom: 1px solid var(--paper-line); font-size: 0.9rem; }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr.total-row td { font-weight: 700; background: color-mix(in srgb, var(--red) 8%, transparent); }
+  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+
+  footer.note { color: var(--ink-soft); font-size: 0.82rem; line-height: 1.6; border-top: 1px solid var(--paper-line); padding-top: 18px; }
+
+  /* ── Personal history in reveal ─────────────────────── */
+  .reveal-history { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 2px; }
+  .rh-item { text-align: center; background: var(--paper); border-radius: 3px; padding: 8px 4px 6px; }
+  .rh-num { font-family: "Bebas Neue","Anton",sans-serif; font-size: 1.75rem; line-height: 1; color: var(--red); }
+  .rh-lbl { font-size: 0.58rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-soft); font-weight: 700; margin-top: 3px; }
+
+  /* ── Stats section redesign ──────────────────────────── */
+  .stats-header { display: flex; flex-direction: column; gap: 4px; margin-bottom: 0; }
+  .stats-header h2 { font-size: 1.4rem; color: var(--ink); }
+  .stats-header .sub { color: var(--ink-soft); font-size: 0.88rem; margin: 0; max-width: 56ch; line-height: 1.5; }
+  .cats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  @media (min-width: 460px) { .cats-grid { grid-template-columns: repeat(3, 1fr); } }
+  .cat-card { background: var(--card); border: 1px solid var(--tile-border); border-radius: 4px; padding: 13px 12px 11px; cursor: pointer; transition: transform 0.12s ease, box-shadow 0.12s ease; box-shadow: var(--shadow); display: flex; flex-direction: column; gap: 4px; position: relative; overflow: hidden; }
+  .cat-card::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--cat-color, var(--red)); }
+  .cat-card:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(32,26,20,0.14); }
+  .cat-card-label { font-family: "Anton",sans-serif; font-size: 1rem; letter-spacing: 0.03em; color: var(--ink); }
+  .cat-card-nums { display: flex; align-items: baseline; gap: 5px; margin-top: 2px; }
+  .cat-card-count { font-family: "Anton",sans-serif; font-size: 1.9rem; line-height: 1; color: var(--cat-color, var(--red)); }
+  .cat-card-unit { font-size: 0.67rem; color: var(--ink-soft); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+  .cat-card-dates { font-size: 0.75rem; color: var(--ink-soft); }
+  .cat-total-card { background: var(--red); border-color: var(--red-deep); }
+  .cat-total-card::before { display: none; }
+  .cat-total-card .cat-card-label, .cat-total-card .cat-card-count { color: var(--red-ink); }
+  .cat-total-card .cat-card-unit, .cat-total-card .cat-card-dates { color: rgba(255,255,255,0.65); }
+  .cat-total-card:hover { box-shadow: 0 6px 22px rgba(164,31,44,0.42); }
+
+  .funfacts { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  @media (min-width: 460px) { .funfacts { grid-template-columns: repeat(3, 1fr); } }
+  .ff-item { background: var(--card); border: 1px solid var(--tile-border); border-radius: 4px; padding: 12px; box-shadow: var(--shadow); }
+  .ff-label { font-size: 0.62rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-soft); font-weight: 700; margin-bottom: 4px; }
+  .ff-value { font-family: "Anton",sans-serif; font-size: 1.1rem; color: var(--ink); line-height: 1.2; }
+  .ff-sub { font-size: 0.7rem; color: var(--ink-soft); margin-top: 2px; }
+
+  /* ── Stats modal ─────────────────────────────────────── */
+  .modal-overlay { position: fixed; inset: 0; background: rgba(12,9,6,0.88); display: flex; align-items: center; justify-content: center; z-index: 200; padding: 20px; backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
+  .modal-overlay[hidden] { display: none; }
+  .modal-card { background: var(--card); border: 1px solid var(--tile-border); border-radius: 6px; width: 100%; max-width: 380px; max-height: 90vh; overflow-y: auto; box-shadow: 0 32px 80px rgba(0,0,0,0.9); }
+  .modal-header { display: flex; align-items: center; justify-content: space-between; padding: 20px 20px 0; }
+  .modal-header h2 { font-size: 1.15rem; color: var(--ink); }
+  .modal-close { background: none; border: none; color: var(--ink-soft); cursor: pointer; font-size: 1.1rem; padding: 4px 8px; border-radius: 3px; font-family: inherit; }
+  .modal-close:hover { color: var(--ink); }
+  .modal-body { padding: 16px 20px 24px; display: flex; flex-direction: column; gap: 18px; }
+  .modal-history-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+  .mh-item { text-align: center; background: var(--paper); border-radius: 4px; padding: 10px 4px 8px; }
+  .mh-num { font-family: "Bebas Neue","Anton",sans-serif; font-size: 1.85rem; line-height: 1; color: var(--red); }
+  .mh-lbl { font-size: 0.57rem; letter-spacing: 0.09em; text-transform: uppercase; color: var(--ink-soft); font-weight: 700; margin-top: 3px; }
+  .modal-section-label { font-size: 0.65rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-soft); font-weight: 700; border-top: 1px solid var(--paper-line); padding-top: 16px; margin-top: -4px; }
+  .dist-grid { display: flex; flex-direction: column; gap: 5px; }
+  .dist-row { display: grid; grid-template-columns: 16px 1fr; gap: 10px; align-items: center; }
+  .dist-num { font-weight: 700; color: var(--ink-soft); font-size: 0.85rem; text-align: right; }
+  .dist-bar-wrap { background: var(--paper); border-radius: 3px; height: 26px; overflow: hidden; }
+  .dist-bar { height: 100%; background: var(--red); border-radius: 3px; display: flex; align-items: center; justify-content: flex-end; padding-right: 8px; font-size: 0.78rem; font-weight: 700; color: var(--red-ink); min-width: 28px; font-family: "Bebas Neue","Anton",sans-serif; letter-spacing: 0.03em; transition: width 0.5s cubic-bezier(0.4,0,0.2,1); }
+  .dist-bar.current { background: var(--ink-soft); }
+  .cats-list { display: flex; flex-direction: column; gap: 6px; }
+  .cats-row { display: grid; grid-template-columns: 1fr auto; gap: 8px; align-items: center; font-size: 0.88rem; }
+  .cats-name { color: var(--ink); font-weight: 600; }
+  .cats-wins { font-family: "Bebas Neue","Anton",sans-serif; font-size: 1rem; color: var(--red); letter-spacing: 0.04em; }
+</style>
+
+<div class="page">
+  <header class="masthead">
+    <div class="masthead-top">
+      <div class="masthead-text">
+        <div class="kicker" id="kicker">Asociación Alumni · Top 14 URBA 2026</div>
+        <h1>APELLIDOS<span>el wordle del club</span></h1>
+      </div>
+      <div class="masthead-right">
+        <button class="stats-icon-btn" id="statsBtn" aria-label="Ver mis estadísticas" title="Mis estadísticas">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="18" y="3" width="4" height="18"/><rect x="10" y="8" width="4" height="13"/><rect x="2" y="13" width="4" height="8"/>
+          </svg>
+        </button>
+        <div class="jersey-deco" aria-hidden="true">
+          <svg viewBox="0 0 100 118" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <clipPath id="jc"><path d="M28,24 L5,40 L17,52 L17,110 L83,110 L83,52 L95,40 L72,24 C68,30 62,34 50,34 C38,34 32,30 28,24Z"/></clipPath>
+            </defs>
+            <!-- white jersey base -->
+            <path d="M28,24 L5,40 L17,52 L17,110 L83,110 L83,52 L95,40 L72,24 C68,30 62,34 50,34 C38,34 32,30 28,24Z" fill="#f5f5f5"/>
+            <g clip-path="url(#jc)">
+              <!-- red hoops — Alumni colors -->
+              <rect x="0" y="33" width="100" height="15" fill="#d12030"/>
+              <rect x="0" y="61" width="100" height="15" fill="#d12030"/>
+              <rect x="0" y="89" width="100" height="15" fill="#d12030"/>
+            </g>
+            <!-- v-collar -->
+            <path d="M43,24 L50,34 L57,24" stroke="#d12030" stroke-width="2.5" fill="none" stroke-linejoin="round"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+    <p class="tag">Adiviná el apellido de un jugador en 6 intentos. Elegí una categoría o jugá con todo el club.</p>
+  </header>
+
+  <div class="hoops" role="presentation"></div>
+
+  <div class="demo-banner">
+    <strong>Plantel cargado.</strong> <span id="totalPlayersInline">—</span> jugadores únicos del plantel de Asociación Alumni, Top 14 URBA 2026. Con cada intento fallido aparecen pistas: puesto, categoría y una letra.
+  </div>
+
+  <div class="team-select-wrap">
+    <label class="team-select-label" for="teamSelect">Categoría</label>
+    <select id="teamSelect" class="team-select" aria-label="Elegir categoría"></select>
+  </div>
+
+  <main class="board-wrap">
+    <div class="message" id="message" aria-live="polite"></div>
+    <div class="hints" id="hints" aria-live="polite"></div>
+    <div class="board" id="board"></div>
+  </main>
+
+  <section class="keyboard" id="keyboard" aria-label="Teclado"></section>
+
+  <section class="reveal-card" id="revealCard" hidden>
+    <div class="eyebrow" id="revealEyebrow">Adivinaste</div>
+    <h3 id="revealName">—</h3>
+    <div class="meta" id="revealMeta">—</div>
+    <div class="reveal-history" id="revealHistory"></div>
+    <div class="reveal-actions">
+      <button class="btn primary" id="playAgainBtn">Jugar de nuevo</button>
+      <button class="btn ghost" id="changeTeamBtn">Cambiar categoría</button>
+      <button class="btn ghost" id="shareBtn">Compartir resultado</button>
+    </div>
+    <div class="share-box" id="shareBox"></div>
+  </section>
+
+  <section class="stats">
+    <div class="stats-header">
+      <h2>El plantel</h2>
+      <p class="sub">Jugadores por categoría en el Top 14 URBA 2026. Tocá una categoría para jugar ese pool.</p>
+    </div>
+    <div class="cats-grid" id="statsBody"></div>
+    <div class="funfacts" id="funfactsEl"></div>
+  </section>
+
+  <footer class="note">
+    Fuente: formaciones publicadas por @aalumni en Instagram, Top 14 URBA 2026. Los apellidos se comparan sin tildes; la Ñ cuenta como letra propia.
+  </footer>
+</div>
+
+<!-- Stats modal -->
+<div class="modal-overlay" id="statsModal" hidden role="dialog" aria-modal="true" aria-label="Mis estadísticas">
+  <div class="modal-card">
+    <div class="modal-header">
+      <h2>Mis estadísticas</h2>
+      <button class="modal-close" id="statsModalClose" aria-label="Cerrar">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-history-grid" id="modalHistory">
+        <div class="mh-item"><div class="mh-num">—</div><div class="mh-lbl">Partidas</div></div>
+        <div class="mh-item"><div class="mh-num">—</div><div class="mh-lbl">Victorias</div></div>
+        <div class="mh-item"><div class="mh-num">—</div><div class="mh-lbl">Racha</div></div>
+        <div class="mh-item"><div class="mh-num">—</div><div class="mh-lbl">Mejor racha</div></div>
+      </div>
+      <div class="modal-section-label">Distribución de intentos</div>
+      <div class="dist-grid" id="modalDist"></div>
+      <div class="modal-section-label" id="modalCatsLabel" style="display:none">Tus mejores categorías</div>
+      <div class="cats-list" id="modalCats"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  const SEASON_LABEL = "Top 14 URBA 2026 · 19 fechas · 293 jugadores";
+
+  const CAT_LABEL = {
+    "PRIMERA":"Primera","INTER":"Inter","PRE A":"Pre A","PRE B":"Pre B","M22":"M22",
+    "PRE C":"Pre C","PRE D":"Pre D","PRE E":"Pre E","PRE F":"Pre F","PRE G":"Pre G"
+  };
+
+  const CAT_COLORS = {
+    "primera":"#a41f2c","inter":"#1c5fa8","prea":"#1e8449","preb":"#7d6608",
+    "m22":"#6c3483","prec":"#0e7990","pred":"#922b21","pree":"#1b5e20",
+    "pref":"#b7570b","preg":"#4a235a"
+  };
+
+  const COMPOUND_HINT = new Set(["DELCARRIL","DELFRANCO","DIAZLUZZI"]);
+
+  const TEAMS = [
+    { id: "primera", label: "Primera", games: 19, players: [
+      { first: "Santiago", last: "ALDUNCIN", pos: "Segunda línea", primaryCat: "PRIMERA" },
+      { first: "Juan Cruz", last: "ALVARIÑAS", pos: "Octavo", primaryCat: "INTER" },
+      { first: "Patricio", last: "ANDERSON", pos: "Ala", primaryCat: "PRIMERA" },
+      { first: "Juan Patricio", last: "ANDERSON", pos: "Ala", primaryCat: "PRIMERA" },
+      { first: "Fermin", last: "BELMONTE", pos: "Apertura", primaryCat: "INTER" },
+      { first: "Tomas", last: "BIVORT", pos: "Hooker", primaryCat: "PRIMERA" },
+      { first: "Francisco", last: "BOTTONI", pos: "Pilar", primaryCat: "PRIMERA" },
+      { first: "Juan Cruz", last: "BOTTONI", pos: "Pilar", primaryCat: "PRIMERA" },
+      { first: "Guido", last: "CAMBARERI", pos: "Pilar", primaryCat: "PRE A" },
+      { first: "Bautista", last: "CANZANI", pos: "Apertura", primaryCat: "PRIMERA" },
+      { first: "Mateo", last: "CASTANIER", pos: "Wing", primaryCat: "PRIMERA" },
+      { first: "Maximo", last: "CASTRILLO", pos: "Pilar", primaryCat: "INTER" },
+      { first: "Franco", last: "COZZI", pos: "Pilar", primaryCat: "INTER" },
+      { first: "Tomas", last: "CUBILLA", pos: "Centro", primaryCat: "PRIMERA" },
+      { first: "Ignacio", last: "CUBILLA", pos: "Ala", primaryCat: "PRIMERA" },
+      { first: "Matias", last: "DELFRANCO", pos: "Full back", primaryCat: "PRIMERA" },
+      { first: "Sebastian", last: "FAUVE", pos: "Segunda línea", primaryCat: "PRIMERA" },
+      { first: "Ramon", last: "FUENTES", pos: "Wing", primaryCat: "PRIMERA" },
+      { first: "Santiago", last: "GONZALEZ", pos: "Centro", primaryCat: "INTER" },
+      { first: "Maximo", last: "LAMELAS", pos: "Hooker", primaryCat: "INTER" },
+      { first: "Federico", last: "LUCCA", pos: "Pilar", primaryCat: "INTER" },
+      { first: "Ignacio", last: "MILOU", pos: "Ala", primaryCat: "INTER" },
+      { first: "Santiago", last: "MONTAGNER", pos: "Octavo", primaryCat: "PRIMERA" },
+      { first: "Manuel", last: "MORA", pos: "Segunda línea", primaryCat: "PRIMERA" },
+      { first: "Santiago", last: "NEYRA", pos: "Octavo", primaryCat: "PRIMERA" },
+      { first: "Tomas", last: "PASSEROTTI", pos: "Medio scrum", primaryCat: "PRIMERA" },
+      { first: "Santiago", last: "PERNAS", pos: "Wing", primaryCat: "PRIMERA" },
+      { first: "Franco", last: "SABATO", pos: "Centro", primaryCat: "INTER" },
+      { first: "Gonzalo", last: "TAPIA", pos: "Full back", primaryCat: "INTER" },
+      { first: "Rocco", last: "TESTONI", pos: "Medio scrum", primaryCat: "PRIMERA" },
+      { first: "Filippo", last: "TESTONI", pos: "Centro", primaryCat: "PRIMERA" },
+      { first: "Bautista", last: "VIDAL", pos: "Pilar", primaryCat: "INTER" },
+      { first: "Aquiles", last: "VIEYRA", pos: "Wing", primaryCat: "PRIMERA" },
+      { first: "Tobias", last: "WADE", pos: "Full back", primaryCat: "PRIMERA" },
+      { first: "Antonio", last: "WAGENER", pos: "Hooker", primaryCat: "PRE A" },
+      { first: "Ezequiel", last: "ZALAZAR", pos: "Medio scrum", primaryCat: "INTER" },
+    ] },
+    { id: "inter", label: "Inter", games: 18, players: [
+      { first: "Santiago", last: "ALDUNCIN", pos: "Segunda línea", primaryCat: "PRIMERA" },
+      { first: "Juan Cruz", last: "ALVARIÑAS", pos: "Octavo", primaryCat: "INTER" },
+      { first: "Tomas", last: "BALDO", pos: "Pilar", primaryCat: "PRE A" },
+      { first: "Fermin", last: "BELMONTE", pos: "Apertura", primaryCat: "INTER" },
+      { first: "Santino", last: "BIANCHI", pos: "Centro", primaryCat: "INTER" },
+      { first: "Guido", last: "CAMBARERI", pos: "Pilar", primaryCat: "PRE A" },
+      { first: "Matias", last: "CANZANI", pos: "Ala", primaryCat: "INTER" },
+      { first: "Mateo", last: "CASTANIER", pos: "Wing", primaryCat: "PRIMERA" },
+      { first: "Maximo", last: "CASTRILLO", pos: "Pilar", primaryCat: "INTER" },
+      { first: "Jeronimo", last: "CHAVES", pos: "Centro", primaryCat: "PRE A" },
+      { first: "Franco", last: "COZZI", pos: "Pilar", primaryCat: "INTER" },
+      { first: "Matias", last: "DELFRANCO", pos: "Full back", primaryCat: "PRIMERA" },
+      { first: "Agos", last: "DESANTO", pos: "Centro", primaryCat: "INTER" },
+      { first: "Agostino", last: "DESANTO", pos: "Centro", primaryCat: "INTER" },
+      { first: "Santiago", last: "DEVOTO", pos: "Segunda línea", primaryCat: "PRE A" },
+      { first: "Joaquin", last: "DIAZLUZZI", pos: "Apertura", primaryCat: "INTER" },
+      { first: "Manuel", last: "DOMNANOVICH", pos: "Centro", primaryCat: "PRE A" },
+      { first: "Sebastian", last: "FAUVE", pos: "Segunda línea", primaryCat: "PRIMERA" },
+      { first: "Nicolas", last: "FRENE", pos: "Pilar", primaryCat: "PRE A" },
+      { first: "Fermin", last: "FUENTES", pos: "Wing", primaryCat: "INTER" },
+      { first: "Santiago", last: "GONZALEZ", pos: "Centro", primaryCat: "INTER" },
+      { first: "Tobias", last: "GUIMAREY", pos: "Apertura", primaryCat: "M22" },
+      { first: "Thiago", last: "JUDGES", pos: "Segunda línea", primaryCat: "PRE B" },
+      { first: "Maximo", last: "LAMELAS", pos: "Hooker", primaryCat: "INTER" },
+      { first: "Federico", last: "LUCA", pos: "Pilar", primaryCat: "INTER" },
+      { first: "Federico", last: "LUCCA", pos: "Pilar", primaryCat: "INTER" },
+      { first: "Jacinto", last: "MACIEL", pos: "Full back", primaryCat: "INTER" },
+      { first: "Luca", last: "MARIANI", pos: "Segunda línea", primaryCat: "PRE B" },
+      { first: "Geronimo", last: "MAZZONI", pos: "Segunda línea", primaryCat: "INTER" },
+      { first: "Ignacio", last: "MENDONCA", pos: "Octavo", primaryCat: "PRE A" },
+      { first: "Benjamin", last: "MESONES", pos: "Centro", primaryCat: "INTER" },
+      { first: "Ignacio", last: "MILOU", pos: "Ala", primaryCat: "INTER" },
+      { first: "Augusto", last: "MINA", pos: "Segunda línea", primaryCat: "INTER" },
+      { first: "Ignacio", last: "MIÑANA", pos: "Hooker", primaryCat: "PRE B" },
+      { first: "Santiago", last: "MONTAGNER", pos: "Octavo", primaryCat: "PRIMERA" },
+      { first: "Tomas", last: "ORTIZ", pos: "Apertura", primaryCat: "PRE A" },
+      { first: "Francisco", last: "ORTIZ", pos: "Medio scrum", primaryCat: "PRE A" },
+      { first: "Joaquin", last: "PASCUAL", pos: "Segunda línea", primaryCat: "INTER" },
+      { first: "Facundo", last: "PEIRONE", pos: "Wing", primaryCat: "PRE A" },
+      { first: "Felipe", last: "RIVAS", pos: "Centro", primaryCat: "PRE A" },
+      { first: "Luca", last: "SABATO", pos: "Wing", primaryCat: "INTER" },
+      { first: "Franco", last: "SABATO", pos: "Centro", primaryCat: "INTER" },
+      { first: "Lucas", last: "SABATO", pos: "Wing", primaryCat: "INTER" },
+      { first: "Gonzalo", last: "TAPIA", pos: "Full back", primaryCat: "INTER" },
+      { first: "Rocco", last: "TESTONI", pos: "Medio scrum", primaryCat: "PRIMERA" },
+      { first: "Bautista", last: "VASSOLO", pos: "Ala", primaryCat: "INTER" },
+      { first: "Bautista", last: "VIDAL", pos: "Pilar", primaryCat: "INTER" },
+      { first: "Antonio", last: "WAGENER", pos: "Hooker", primaryCat: "PRE A" },
+      { first: "Antonio", last: "WAGNER", pos: "Hooker", primaryCat: "PRE A" },
+      { first: "Ezequiel", last: "ZALAZAR", pos: "Medio scrum", primaryCat: "INTER" },
+    ] },
+    { id: "prea", label: "Pre A", games: 18, players: [
+      { first: "Facundo", last: "ALEPIDOTE", pos: "Ala", primaryCat: "PRE A" },
+      { first: "Juan Cruz", last: "ALVARIÑAS", pos: "Octavo", primaryCat: "INTER" },
+      { first: "Facundo", last: "ASI", pos: "Octavo", primaryCat: "PRE B" },
+      { first: "Tomas", last: "BALDO", pos: "Pilar", primaryCat: "PRE A" },
+      { first: "Pedro", last: "BALLATORE", pos: "Full back", primaryCat: "PRE A" },
+      { first: "Santos", last: "BARRAL", pos: "Centro", primaryCat: "PRE B" },
+      { first: "Fermin", last: "BELMONTE", pos: "Apertura", primaryCat: "INTER" },
+      { first: "Nahuel", last: "BENETTI", pos: "Pilar", primaryCat: "PRE B" },
+      { first: "Valentin", last: "BERRETA", pos: "Pilar", primaryCat: "PRE B" },
+      { first: "Guido", last: "CAMBARERI", pos: "Pilar", primaryCat: "PRE A" },
+      { first: "Mateo", last: "CAMPBELL", pos: "Apertura", primaryCat: "PRE B" },
+      { first: "Federico", last: "CANOVAS", pos: "Segunda línea", primaryCat: "PRE B" },
+      { first: "Matias", last: "CANZANI", pos: "Ala", primaryCat: "INTER" },
+      { first: "Maximo", last: "CASTRILLO", pos: "Pilar", primaryCat: "INTER" },
+      { first: "Alejandro", last: "CEBALLOS", pos: "Wing", primaryCat: "PRE A" },
+      { first: "Alejandro", last: "CEVALLOS", pos: "Wing", primaryCat: "PRE A" },
+      { first: "Jeronimo", last: "CHAVES", pos: "Centro", primaryCat: "PRE A" },
+      { first: "Franco", last: "COZZI", pos: "Pilar", primaryCat: "INTER" },
+      { first: "Ramiro", last: "CUEVA", pos: "Pilar", primaryCat: "PRE B" },
+      { first: "Ramiro", last: "CUEVAS", pos: "Pilar", primaryCat: "PRE B" },
+      { first: "Santiago", last: "DEVOTO", pos: "Segunda línea", primaryCat: "PRE A" },
+      { first: "Joaquin", last: "DIAZLUZZI", pos: "Apertura", primaryCat: "INTER" },
+      { first: "Joaquin", last: "DOMECQ", pos: "Wing", primaryCat: "PRE B" },
+      { first: "Manuel", last: "DOMNANOVICH", pos: "Centro", primaryCat: "PRE A" },
+      { first: "Ignacio", last: "DONMANOVICH", pos: "Wing", primaryCat: "PRE A" },
+      { first: "Sebastian", last: "FAUVE", pos: "Segunda línea", primaryCat: "PRIMERA" },
+      { first: "Conrado", last: "FERNANDEZ", pos: "Wing", primaryCat: "M22" },
+      { first: "Gonzalo", last: "FILGUEIRA", pos: "Medio scrum", primaryCat: "PRE C" },
+      { first: "Nicolas", last: "FRENE", pos: "Pilar", primaryCat: "PRE A" },
+      { first: "Fermin", last: "FUENTES", pos: "Wing", primaryCat: "INTER" },
+      { first: "Juan", last: "GARRI", pos: "Hooker", primaryCat: "PRE C" },
+      { first: "Santiago", last: "GONZALEZ", pos: "Centro", primaryCat: "INTER" },
+      { first: "Juan Ignacio", last: "GUERRERO", pos: "Ala", primaryCat: "M22" },
+      { first: "Tobias", last: "GUIMAREY", pos: "Apertura", primaryCat: "M22" },
+      { first: "Thiago", last: "JUDGES", pos: "Segunda línea", primaryCat: "PRE B" },
+      { first: "Mateo", last: "MACHAIN", pos: "Centro", primaryCat: "PRE B" },
+      { first: "Jacinto", last: "MACIEL", pos: "Full back", primaryCat: "INTER" },
+      { first: "Luca", last: "MARIANI", pos: "Segunda línea", primaryCat: "PRE B" },
+      { first: "Geronimo", last: "MAZZONI", pos: "Segunda línea", primaryCat: "INTER" },
+      { first: "Ignacio", last: "MENDONCA", pos: "Octavo", primaryCat: "PRE A" },
+      { first: "Benjamin", last: "MESONES", pos: "Centro", primaryCat: "INTER" },
+      { first: "Ignacio", last: "MILOU", pos: "Ala", primaryCat: "INTER" },
+      { first: "Diego", last: "MILTHALER", pos: "Ala", primaryCat: "PRE C" },
+      { first: "Augusto", last: "MINA", pos: "Segunda línea", primaryCat: "INTER" },
+      { first: "Ignacio", last: "MIÑANA", pos: "Hooker", primaryCat: "PRE B" },
+      { first: "Diego", last: "MITHALER", pos: "Ala", primaryCat: "PRE B" },
+      { first: "Tomas", last: "ORTIZ", pos: "Apertura", primaryCat: "PRE A" },
+      { first: "Francisco", last: "ORTIZ", pos: "Medio scrum", primaryCat: "PRE A" },
+      { first: "Facundo", last: "PEIRONE", pos: "Wing", primaryCat: "PRE A" },
+      { first: "Fantastico", last: "PEIRONE", pos: "Wing", primaryCat: "PRE A" },
+      { first: "Bautista", last: "PICCININI", pos: "Octavo", primaryCat: "PRE A" },
+      { first: "Bautista", last: "QUESNEL", pos: "Wing", primaryCat: "M22" },
+      { first: "Felipe", last: "RIVAS", pos: "Centro", primaryCat: "PRE A" },
+      { first: "Tiziano", last: "ROCHA", pos: "Segunda línea", primaryCat: "M22" },
+      { first: "Luca", last: "SABATO", pos: "Wing", primaryCat: "INTER" },
+      { first: "Francisco", last: "TRIGILI", pos: "Ala", primaryCat: "PRE B" },
+      { first: "Segundo", last: "UGO", pos: "Centro", primaryCat: "M22" },
+      { first: "Bautista", last: "VASSOLO", pos: "Ala", primaryCat: "INTER" },
+      { first: "Bautista", last: "VIDAL", pos: "Pilar", primaryCat: "INTER" },
+      { first: "Antonio", last: "WAGENER", pos: "Hooker", primaryCat: "PRE A" },
+      { first: "Antonio", last: "WAGNER", pos: "Hooker", primaryCat: "PRE A" },
+      { first: "Agustin", last: "WILLIAMS", pos: "Wing", primaryCat: "PRE B" },
+      { first: "Ezequiel", last: "ZALAZAR", pos: "Medio scrum", primaryCat: "INTER" },
+    ] },
+    { id: "preb", label: "Pre B", games: 18, players: [
+      { first: "Joaquin", last: "AMBROA", pos: "Ala", primaryCat: "PRE D" },
+      { first: "Facundo", last: "ASI", pos: "Octavo", primaryCat: "PRE B" },
+      { first: "Pedro", last: "BALLATORE", pos: "Full back", primaryCat: "PRE A" },
+      { first: "Santos", last: "BARRAL", pos: "Centro", primaryCat: "PRE B" },
+      { first: "Fermin", last: "BELMONTE", pos: "Apertura", primaryCat: "INTER" },
+      { first: "Nahuel", last: "BENETTI", pos: "Pilar", primaryCat: "PRE B" },
+      { first: "Valentin", last: "BERRETA", pos: "Pilar", primaryCat: "PRE B" },
+      { first: "Juan Marcos", last: "BERRETA", pos: "Full back", primaryCat: "PRE B" },
+      { first: "Jose", last: "BIVORT", pos: "Hooker", primaryCat: "PRE B" },
+      { first: "Thiago", last: "BOLAN", pos: "Centro", primaryCat: "PRE B" },
+      { first: "Valentin", last: "BOURQUIN", pos: "Centro", primaryCat: "PRE D" },
+      { first: "Ciro", last: "CAFONCELLI", pos: "Centro", primaryCat: "PRE C" },
+      { first: "Mateo", last: "CAMPBEL", pos: "Apertura", primaryCat: "PRE B" },
+      { first: "Mateo", last: "CAMPBELL", pos: "Apertura", primaryCat: "PRE B" },
+      { first: "Federico", last: "CANOVAS", pos: "Segunda línea", primaryCat: "PRE B" },
+      { first: "Benjamin", last: "CARDOSO", pos: "Ala", primaryCat: "M22" },
+      { first: "Alejandro", last: "CEBALLOS", pos: "Wing", primaryCat: "PRE A" },
+      { first: "Jeronimo", last: "CHAVES", pos: "Centro", primaryCat: "PRE A" },
+      { first: "Manuel", last: "CINGOLANI", pos: "Centro", primaryCat: "PRE D" },
+      { first: "Juan", last: "CONSTANTINO", pos: "Ala", primaryCat: "PRE C" },
+      { first: "Franco", last: "COZZI", pos: "Pilar", primaryCat: "INTER" },
+      { first: "Ezequiel", last: "CUBILLA", pos: "Ala", primaryCat: "PRE C" },
+      { first: "Ramiro", last: "CUEVA", pos: "Pilar", primaryCat: "PRE B" },
+      { first: "Ramiro", last: "CUEVAS", pos: "Pilar", primaryCat: "PRE B" },
+      { first: "Felipe", last: "DAUD", pos: "Ala", primaryCat: "PRE C" },
+      { first: "Santiago", last: "DELCARRIL", pos: "Octavo", primaryCat: "PRE C" },
+      { first: "Santiago", last: "DEVOTO", pos: "Segunda línea", primaryCat: "PRE A" },
+      { first: "Joaquin", last: "DIAZLUZZI", pos: "Apertura", primaryCat: "INTER" },
+      { first: "Joaquin", last: "DOMECQ", pos: "Wing", primaryCat: "PRE B" },
+      { first: "Ignacio", last: "DOMNANOVICH", pos: "Wing", primaryCat: "PRE B" },
+      { first: "Manuel", last: "DOMNANOVICH", pos: "Centro", primaryCat: "PRE A" },
+      { first: "Gonzalo", last: "FILGUEIRA", pos: "Medio scrum", primaryCat: "PRE C" },
+      { first: "Nicolas", last: "FRENE", pos: "Pilar", primaryCat: "PRE A" },
+      { first: "Santos", last: "GARCIA", pos: "Hooker", primaryCat: "M22" },
+      { first: "Juan", last: "GARRI", pos: "Hooker", primaryCat: "PRE C" },
+      { first: "Juan Ignacio", last: "GUERRERO", pos: "Ala", primaryCat: "M22" },
+      { first: "Tobias", last: "GUIMAREY", pos: "Apertura", primaryCat: "M22" },
+      { first: "Thiago", last: "JUDGES", pos: "Segunda línea", primaryCat: "PRE B" },
+      { first: "Mateo", last: "MACHAIN", pos: "Centro", primaryCat: "PRE B" },
+      { first: "Jacinto", last: "MACIEL", pos: "Full back", primaryCat: "INTER" },
+      { first: "Jaime", last: "MAGLIONE", pos: "Medio scrum", primaryCat: "M22" },
+      { first: "Pedro", last: "MAINARDI", pos: "Segunda línea", primaryCat: "PRE C" },
+      { first: "Luca", last: "MARIANI", pos: "Segunda línea", primaryCat: "PRE B" },
+      { first: "Ignacio", last: "MENDONCA", pos: "Octavo", primaryCat: "PRE A" },
+      { first: "Benjamin", last: "MESONES", pos: "Centro", primaryCat: "INTER" },
+      { first: "Diego", last: "MILTHALER", pos: "Ala", primaryCat: "PRE C" },
+      { first: "Ignacio", last: "MINANA", pos: "Hooker", primaryCat: "PRE B" },
+      { first: "Ignacio", last: "MIÑANA", pos: "Hooker", primaryCat: "PRE B" },
+      { first: "Diego", last: "MITHALER", pos: "Ala", primaryCat: "PRE B" },
+      { first: "Francisco", last: "ORTIZ", pos: "Medio scrum", primaryCat: "PRE A" },
+      { first: "Joaquin", last: "PASCUAL", pos: "Segunda línea", primaryCat: "INTER" },
+      { first: "Facundo", last: "PAZ", pos: "Segunda línea", primaryCat: "PRE C" },
+      { first: "Facundo", last: "PEIRONE", pos: "Wing", primaryCat: "PRE A" },
+      { first: "Bautista", last: "PICCININI", pos: "Octavo", primaryCat: "PRE A" },
+      { first: "Bautista", last: "QUESNEL", pos: "Wing", primaryCat: "M22" },
+      { first: "Tiziano", last: "ROCHA", pos: "Segunda línea", primaryCat: "M22" },
+      { first: "Mateo", last: "SANCHEZ", pos: "Medio scrum", primaryCat: "M22" },
+      { first: "Lisandro", last: "SEGURA", pos: "Wing", primaryCat: "PRE B" },
+      { first: "Francisco", last: "TRIGILI", pos: "Ala", primaryCat: "PRE B" },
+      { first: "Bautista", last: "VIDAL", pos: "Pilar", primaryCat: "INTER" },
+      { first: "Vladimir", last: "VIZGARRA", pos: "Pilar", primaryCat: "PRE C" },
+      { first: "Agustin", last: "WILLIAMS", pos: "Wing", primaryCat: "PRE B" },
+      { first: "Alejandro", last: "WILLIAMS", pos: "Apertura", primaryCat: "PRE B" },
+    ] },
+    { id: "m22", label: "M22", games: 17, players: [
+      { first: "Leandro", last: "ALZUGARAY", pos: "Segunda línea", primaryCat: "M22" },
+      { first: "Facundo", last: "ASI", pos: "Octavo", primaryCat: "PRE B" },
+      { first: "Valentin", last: "BERRETA", pos: "Pilar", primaryCat: "PRE B" },
+      { first: "Jose Maria", last: "BIVORT", pos: "Hooker", primaryCat: "M22" },
+      { first: "Jose", last: "BIVORT", pos: "Hooker", primaryCat: "PRE B" },
+      { first: "Tiago", last: "BOLAN", pos: "Centro", primaryCat: "M22" },
+      { first: "Emiliano", last: "BRUNA", pos: "Centro", primaryCat: "PRE D" },
+      { first: "Mateo", last: "CAMPBELL", pos: "Apertura", primaryCat: "PRE B" },
+      { first: "Benjamin", last: "CARDOSO", pos: "Ala", primaryCat: "M22" },
+      { first: "Benjamin", last: "CARDOZO", pos: "Ala", primaryCat: "M22" },
+      { first: "Rafael", last: "CASANOVA", pos: "Segunda línea", primaryCat: "PRE E" },
+      { first: "Alejandro", last: "CEBALLOS", pos: "Wing", primaryCat: "PRE A" },
+      { first: "Pedro", last: "CELAA", pos: "Full back", primaryCat: "M22" },
+      { first: "Francisco", last: "CHAMO", pos: "Pilar", primaryCat: "M22" },
+      { first: "Tomas", last: "COBO", pos: "Wing", primaryCat: "PRE D" },
+      { first: "Ramiro", last: "CUEVA", pos: "Pilar", primaryCat: "PRE B" },
+      { first: "Ramiro", last: "CUEVAS", pos: "Pilar", primaryCat: "PRE B" },
+      { first: "Joaquin", last: "DILLON", pos: "Apertura", primaryCat: "PRE D" },
+      { first: "Ignacio", last: "DOMNANOVICH", pos: "Wing", primaryCat: "PRE B" },
+      { first: "Manuel", last: "DOMNANOVICH", pos: "Centro", primaryCat: "PRE A" },
+      { first: "Simon", last: "ESTELA", pos: "Segunda línea", primaryCat: "M22" },
+      { first: "Conrado", last: "FERNANDEZ", pos: "Wing", primaryCat: "M22" },
+      { first: "Conrado", last: "FERNANDEZ UGARTUA", pos: "Full back", primaryCat: "M22" },
+      { first: "Santiago", last: "FRAGA", pos: "Apertura", primaryCat: "PRE E" },
+      { first: "Dante", last: "FRANGELLA", pos: "Hooker", primaryCat: "M22" },
+      { first: "Santos", last: "GARCIA", pos: "Hooker", primaryCat: "M22" },
+      { first: "Juan Ignacio", last: "GUERRERO", pos: "Ala", primaryCat: "M22" },
+      { first: "Tobias", last: "GUIMAREY", pos: "Apertura", primaryCat: "M22" },
+      { first: "Lucas", last: "GUIÑAZU", pos: "Wing", primaryCat: "PRE C" },
+      { first: "Wlado", last: "JOMANOVICH", pos: "Ala", primaryCat: "M22" },
+      { first: "Tiago", last: "JUDGES", pos: "Segunda línea", primaryCat: "M22" },
+      { first: "Ramon", last: "LAWSON", pos: "Octavo", primaryCat: "M22" },
+      { first: "Jaime", last: "MAGLIONE", pos: "Medio scrum", primaryCat: "M22" },
+      { first: "Jeronimo", last: "O GORMAN", pos: "Centro", primaryCat: "M22" },
+      { first: "Jeronimo", last: "OGORMAN", pos: "Centro", primaryCat: "M22" },
+      { first: "Martin", last: "OTONDO", pos: "Ala", primaryCat: "M22" },
+      { first: "Salvador", last: "PAGANO", pos: "Wing", primaryCat: "PRE E" },
+      { first: "Bautista", last: "QUESNEL", pos: "Wing", primaryCat: "M22" },
+      { first: "Bautista", last: "QUESNELL", pos: "Wing", primaryCat: "M22" },
+      { first: "Bautista", last: "QUEZNEL", pos: "Wing", primaryCat: "M22" },
+      { first: "Tiziano", last: "ROCHA", pos: "Segunda línea", primaryCat: "M22" },
+      { first: "Santiago", last: "ROMANO", pos: "Octavo", primaryCat: "PRE D" },
+      { first: "Facundo", last: "ROMERO", pos: "Pilar", primaryCat: "M22" },
+      { first: "Mateo", last: "SANCHEZ", pos: "Medio scrum", primaryCat: "M22" },
+      { first: "Benicio", last: "SHIRADO", pos: "Ala", primaryCat: "M22" },
+      { first: "Lucas", last: "TEJERINA", pos: "Pilar", primaryCat: "M22" },
+      { first: "Segundo", last: "UGO", pos: "Centro", primaryCat: "M22" },
+      { first: "Rafael", last: "VASSOLO", pos: "Wing", primaryCat: "M22" },
+      { first: "Salvador", last: "VENIER", pos: "Segunda línea", primaryCat: "M22" },
+    ] },
+    { id: "prec", label: "Pre C", games: 18, players: [
+      { first: "Facundo", last: "ALEPIDOTE", pos: "Ala", primaryCat: "PRE A" },
+      { first: "Leandro", last: "ALZUGARAY", pos: "Segunda línea", primaryCat: "M22" },
+      { first: "Joaquin", last: "AMBROA", pos: "Ala", primaryCat: "PRE D" },
+      { first: "Marcos", last: "ARAGON", pos: "Hooker", primaryCat: "PRE D" },
+      { first: "Pedro", last: "BALLATORE", pos: "Full back", primaryCat: "PRE A" },
+      { first: "Nahuel", last: "BENETTI", pos: "Pilar", primaryCat: "PRE B" },
+      { first: "Mateo", last: "BENITEZ", pos: "Pilar", primaryCat: "PRE E" },
+      { first: "Marcos", last: "BERRETA", pos: "Apertura", primaryCat: "PRE C" },
+      { first: "Juan Marcos", last: "BERRETA", pos: "Full back", primaryCat: "PRE B" },
+      { first: "Valentin", last: "BERRETA", pos: "Pilar", primaryCat: "PRE B" },
+      { first: "Valentin", last: "BOURQUIN", pos: "Centro", primaryCat: "PRE D" },
+      { first: "Ciro", last: "CAFONCELLI", pos: "Centro", primaryCat: "PRE C" },
+      { first: "Federico", last: "CANOVAS", pos: "Segunda línea", primaryCat: "PRE B" },
+      { first: "Jeronimo", last: "CASANOVA", pos: "Ala", primaryCat: "PRE F" },
+      { first: "Alejo", last: "CENTURION", pos: "Hooker", primaryCat: "PRE D" },
+      { first: "Manuel", last: "CINGOLANI", pos: "Centro", primaryCat: "PRE D" },
+      { first: "Juan", last: "CONSTANTINO", pos: "Ala", primaryCat: "PRE C" },
+      { first: "Nicolas", last: "CONTE", pos: "Full back", primaryCat: "PRE C" },
+      { first: "Ezequiel", last: "CUBILLA", pos: "Ala", primaryCat: "PRE C" },
+      { first: "Felipe", last: "DAUD", pos: "Ala", primaryCat: "PRE C" },
+      { first: "Santiago", last: "DELCARRIL", pos: "Octavo", primaryCat: "PRE C" },
+      { first: "Diogenes", last: "DEVOTO", pos: "Medio scrum", primaryCat: "PRE E" },
+      { first: "Gonzalo", last: "DIAZ", pos: "Centro", primaryCat: "PRE C" },
+      { first: "Joaquin", last: "DILLON", pos: "Apertura", primaryCat: "PRE D" },
+      { first: "Joaquin", last: "DOMECQ", pos: "Wing", primaryCat: "PRE B" },
+      { first: "Gonzalo", last: "FILGUEIRA", pos: "Medio scrum", primaryCat: "PRE C" },
+      { first: "Santiago", last: "FRAGA", pos: "Apertura", primaryCat: "PRE E" },
+      { first: "Santos", last: "GARCIA", pos: "Hooker", primaryCat: "M22" },
+      { first: "Juan", last: "GARRI", pos: "Hooker", primaryCat: "PRE C" },
+      { first: "Pedro", last: "GIRINI", pos: "Pilar", primaryCat: "PRE D" },
+      { first: "Facundo", last: "GUERRERO", pos: "Wing", primaryCat: "PRE D" },
+      { first: "Gonzalo", last: "GUILLIGAN", pos: "Wing", primaryCat: "PRE D" },
+      { first: "Lucas", last: "GUIÑAZU", pos: "Wing", primaryCat: "PRE C" },
+      { first: "Bautista", last: "HARDIE", pos: "Apertura", primaryCat: "PRE C" },
+      { first: "Wladimir", last: "JOVANOVICH", pos: "Ala", primaryCat: "PRE D" },
+      { first: "Segundo", last: "LANUSSE", pos: "Full back", primaryCat: "PRE C" },
+      { first: "Mateo", last: "MACHAIN", pos: "Centro", primaryCat: "PRE B" },
+      { first: "Jaime", last: "MAGLIONE", pos: "Medio scrum", primaryCat: "M22" },
+      { first: "Pedro", last: "MAINARDI", pos: "Segunda línea", primaryCat: "PRE C" },
+      { first: "Toribio", last: "MALLEA", pos: "Pilar", primaryCat: "PRE C" },
+      { first: "Tomas", last: "MARTIN", pos: "Octavo", primaryCat: "PRE D" },
+      { first: "Juan Francisco", last: "MARTINEZ", pos: "Wing", primaryCat: "PRE D" },
+      { first: "Tobias", last: "MARTINEZ", pos: "Wing", primaryCat: "PRE C" },
+      { first: "Diego", last: "MILTHALER", pos: "Ala", primaryCat: "PRE C" },
+      { first: "Diego", last: "MITHALER", pos: "Ala", primaryCat: "PRE B" },
+      { first: "Lucas", last: "MUGHERLI", pos: "Centro", primaryCat: "PRE F" },
+      { first: "Salvador", last: "PAGANO", pos: "Wing", primaryCat: "PRE E" },
+      { first: "Jonas", last: "PALMA", pos: "Segunda línea", primaryCat: "PRE D" },
+      { first: "Facundo", last: "PAZ", pos: "Segunda línea", primaryCat: "PRE C" },
+      { first: "Facundo", last: "PEIRONE", pos: "Wing", primaryCat: "PRE A" },
+      { first: "Manuel", last: "PIETRA", pos: "Medio scrum", primaryCat: "PRE D" },
+      { first: "Tiziano", last: "ROCHA", pos: "Segunda línea", primaryCat: "M22" },
+      { first: "Ticiano", last: "ROCHA", pos: "Segunda línea", primaryCat: "PRE C" },
+      { first: "Francisco", last: "ROSAS", pos: "Pilar", primaryCat: "PRE D" },
+      { first: "Mateo", last: "SANCHEZ", pos: "Medio scrum", primaryCat: "M22" },
+      { first: "Maximo", last: "SCHMIDT", pos: "Octavo", primaryCat: "PRE C" },
+      { first: "Lisandro", last: "SEGURA", pos: "Wing", primaryCat: "PRE B" },
+      { first: "Maximo", last: "SMITH", pos: "Ala", primaryCat: "PRE C" },
+      { first: "Max", last: "SMITH", pos: "Octavo", primaryCat: "PRE C" },
+      { first: "Matias", last: "SOTO", pos: "Segunda línea", primaryCat: "PRE D" },
+      { first: "Bautista", last: "SOUBRIE", pos: "Segunda línea", primaryCat: "PRE E" },
+      { first: "Mateo", last: "SUPPICICH", pos: "Wing", primaryCat: "PRE E" },
+      { first: "Lucas", last: "TEJERINA", pos: "Pilar", primaryCat: "M22" },
+      { first: "Francisco", last: "TRIGILI", pos: "Ala", primaryCat: "PRE B" },
+      { first: "Rafael", last: "VASSOLO", pos: "Wing", primaryCat: "M22" },
+      { first: "Vladimir", last: "VIZGARRA", pos: "Pilar", primaryCat: "PRE C" },
+      { first: "Valdimir", last: "VIZGARRA", pos: "Pilar", primaryCat: "PRE C" },
+      { first: "Agustin", last: "WILLIAMS", pos: "Wing", primaryCat: "PRE B" },
+    ] },
+    { id: "pred", label: "Pre D", games: 18, players: [
+      { first: "Leandro", last: "ALZUGARAY", pos: "Segunda línea", primaryCat: "M22" },
+      { first: "Lisandro", last: "ALZUGARAY", pos: "Segunda línea", primaryCat: "PRE D" },
+      { first: "Joaco", last: "AMBROA", pos: "Ala", primaryCat: "PRE D" },
+      { first: "Joaquin", last: "AMBROA", pos: "Ala", primaryCat: "PRE D" },
+      { first: "Marcos", last: "ARAGON", pos: "Hooker", primaryCat: "PRE D" },
+      { first: "Nahuel", last: "BENETTI", pos: "Pilar", primaryCat: "PRE B" },
+      { first: "Mateo", last: "BENITEZ", pos: "Pilar", primaryCat: "PRE E" },
+      { first: "Mateo", last: "BENITEZ MACHUCA", pos: "Pilar", primaryCat: "PRE D" },
+      { first: "Valentin", last: "BOURQUIN", pos: "Centro", primaryCat: "PRE D" },
+      { first: "Emiliano", last: "BRUNA", pos: "Centro", primaryCat: "PRE D" },
+      { first: "Ciro", last: "CAFONCELLI", pos: "Centro", primaryCat: "PRE C" },
+      { first: "Facundo", last: "CARIDI", pos: "Segunda línea", primaryCat: "PRE F" },
+      { first: "Rafa", last: "CASANOVA", pos: "Segunda línea", primaryCat: "PRE D" },
+      { first: "Pedro", last: "CELA", pos: "Full back", primaryCat: "PRE D" },
+      { first: "Alejo", last: "CENTURION", pos: "Hooker", primaryCat: "PRE D" },
+      { first: "Manuel", last: "CINGOLANI", pos: "Centro", primaryCat: "PRE D" },
+      { first: "Ignacio", last: "CLARET", pos: "Wing", primaryCat: "PRE F" },
+      { first: "Tomas", last: "COBO", pos: "Wing", primaryCat: "PRE D" },
+      { first: "Lautaro", last: "CONEJERO", pos: "Ala", primaryCat: "PRE E" },
+      { first: "Juan", last: "CONSTANTINO", pos: "Ala", primaryCat: "PRE C" },
+      { first: "Lucas", last: "CONTE", pos: "Apertura", primaryCat: "PRE F" },
+      { first: "Ezequiel", last: "CUBILLA", pos: "Ala", primaryCat: "PRE C" },
+      { first: "Francisco", last: "CUEVA", pos: "Ala", primaryCat: "PRE E" },
+      { first: "Felipe", last: "DAUD", pos: "Ala", primaryCat: "PRE C" },
+      { first: "Santiago", last: "DELCARRIL", pos: "Octavo", primaryCat: "PRE C" },
+      { first: "Diogenes", last: "DEVOTO", pos: "Medio scrum", primaryCat: "PRE E" },
+      { first: "Marcos", last: "DIARBEKIRIAN", pos: "Pilar", primaryCat: "PRE E" },
+      { first: "Gonzalo", last: "DIAZ", pos: "Centro", primaryCat: "PRE C" },
+      { first: "Tomas", last: "DIAZLUZZI", pos: "Full back", primaryCat: "PRE D" },
+      { first: "Joaquin", last: "DILLON", pos: "Apertura", primaryCat: "PRE D" },
+      { first: "Joaquin", last: "DOMECQ", pos: "Wing", primaryCat: "PRE B" },
+      { first: "Conrado", last: "FERNANDEZ", pos: "Wing", primaryCat: "M22" },
+      { first: "Colo", last: "FRAGA", pos: "Apertura", primaryCat: "PRE D" },
+      { first: "Santiago", last: "FRAGA", pos: "Apertura", primaryCat: "PRE E" },
+      { first: "Dante", last: "FRANGELLA", pos: "Hooker", primaryCat: "M22" },
+      { first: "Juan", last: "GARCIA", pos: "Pilar", primaryCat: "PRE D" },
+      { first: "Gonzalo", last: "GILLIGAN", pos: "Wing", primaryCat: "PRE F" },
+      { first: "Pedro", last: "GIRINI", pos: "Pilar", primaryCat: "PRE D" },
+      { first: "Facundo", last: "GUERRERO", pos: "Wing", primaryCat: "PRE D" },
+      { first: "Facu", last: "GUERRERO", pos: "Wing", primaryCat: "PRE D" },
+      { first: "Gonzalo", last: "GUILLIGAN", pos: "Wing", primaryCat: "PRE D" },
+      { first: "Bautista", last: "HARDIE", pos: "Apertura", primaryCat: "PRE C" },
+      { first: "Wladimir", last: "JOVANOVICH", pos: "Ala", primaryCat: "PRE D" },
+      { first: "Joaquin", last: "KELLY", pos: "Full back", primaryCat: "PRE E" },
+      { first: "Jaime", last: "MAGLIONE", pos: "Medio scrum", primaryCat: "M22" },
+      { first: "Pedro", last: "MAINARDI", pos: "Segunda línea", primaryCat: "PRE C" },
+      { first: "Juan", last: "MAINE", pos: "Ala", primaryCat: "PRE E" },
+      { first: "Fran", last: "MAINE", pos: "Segunda línea", primaryCat: "PRE D" },
+      { first: "Toribio", last: "MALLEA", pos: "Pilar", primaryCat: "PRE C" },
+      { first: "Tomas", last: "MARTIN", pos: "Octavo", primaryCat: "PRE D" },
+      { first: "Juan Francisco", last: "MARTINEZ", pos: "Wing", primaryCat: "PRE D" },
+      { first: "Fabricio", last: "MONTANUCCI", pos: "Segunda línea", primaryCat: "PRE E" },
+      { first: "Salvador", last: "PAGANO", pos: "Wing", primaryCat: "PRE E" },
+      { first: "Jonas", last: "PALMA", pos: "Segunda línea", primaryCat: "PRE D" },
+      { first: "Manuel", last: "PIETRA", pos: "Medio scrum", primaryCat: "PRE D" },
+      { first: "Tadeo", last: "RIFNER", pos: "Centro", primaryCat: "PRE D" },
+      { first: "Agustin", last: "RIVERO", pos: "Centro", primaryCat: "PRE F" },
+      { first: "Santiago", last: "ROMANO", pos: "Octavo", primaryCat: "PRE D" },
+      { first: "Facundo", last: "ROMERO", pos: "Pilar", primaryCat: "M22" },
+      { first: "Francisco", last: "ROSAS", pos: "Pilar", primaryCat: "PRE D" },
+      { first: "Pancho", last: "ROSAS", pos: "Pilar", primaryCat: "PRE D" },
+      { first: "Tomas", last: "SALADINO", pos: "Segunda línea", primaryCat: "PRE G" },
+      { first: "Max", last: "SCHMIDT", pos: "Octavo", primaryCat: "PRE D" },
+      { first: "Lisandro", last: "SEGURA", pos: "Wing", primaryCat: "PRE B" },
+      { first: "Francisco", last: "SEGURA", pos: "Full back", primaryCat: "PRE E" },
+      { first: "Fran", last: "SEGURA", pos: "Full back", primaryCat: "PRE D" },
+      { first: "Nicolas", last: "SOSA", pos: "Hooker", primaryCat: "PRE F" },
+      { first: "Matias", last: "SOTO", pos: "Segunda línea", primaryCat: "PRE D" },
+      { first: "Bautista", last: "SOUBRIE", pos: "Segunda línea", primaryCat: "PRE E" },
+      { first: "Mateo", last: "SUPPICICH", pos: "Wing", primaryCat: "PRE E" },
+      { first: "Juan Manuel", last: "VARELA", pos: "Ala", primaryCat: "PRE E" },
+      { first: "Rafael", last: "VASSOLO", pos: "Wing", primaryCat: "M22" },
+      { first: "Salvador", last: "VENIER", pos: "Segunda línea", primaryCat: "M22" },
+      { first: "Francisco", last: "VENIER", pos: "Centro", primaryCat: "PRE D" },
+      { first: "Beltran", last: "VIOLA", pos: "Full back", primaryCat: "PRE D" },
+      { first: "Felipe", last: "WILLIAMS", pos: "Octavo", primaryCat: "PRE D" },
+      { first: "Juan Pablo", last: "ZICARELLI", pos: "Octavo", primaryCat: "PRE D" },
+    ] },
+    { id: "pree", label: "Pre E", games: 15, players: [
+      { first: "Pedro", last: "ALDUNCIN", pos: "Pilar", primaryCat: "PRE F" },
+      { first: "Emi", last: "ALMADA", pos: "Pilar", primaryCat: "PRE E" },
+      { first: "Marcos", last: "ARAGON", pos: "Hooker", primaryCat: "PRE D" },
+      { first: "Manuel", last: "BALLESTER", pos: "Apertura", primaryCat: "PRE E" },
+      { first: "Nahuel", last: "BENETTI", pos: "Pilar", primaryCat: "PRE B" },
+      { first: "Mateo", last: "BENITEZ", pos: "Pilar", primaryCat: "PRE E" },
+      { first: "Mateo", last: "BENITEZ MACHUCA", pos: "Pilar", primaryCat: "PRE D" },
+      { first: "Valentin", last: "BONATO", pos: "Centro", primaryCat: "PRE E" },
+      { first: "Valentino", last: "BONATO", pos: "Centro", primaryCat: "PRE E" },
+      { first: "Matias", last: "BONAZZOLA", pos: "Apertura", primaryCat: "PRE F" },
+      { first: "Valentin", last: "BOURQUIN", pos: "Centro", primaryCat: "PRE D" },
+      { first: "Ignacio", last: "CABRAL", pos: "Hooker", primaryCat: "PRE F" },
+      { first: "Facundo", last: "CARIDDI", pos: "Segunda línea", primaryCat: "PRE E" },
+      { first: "Pampa", last: "CARIDI", pos: "Segunda línea", primaryCat: "PRE E" },
+      { first: "Santiago", last: "CARREÑO", pos: "Pilar", primaryCat: "PRE F" },
+      { first: "Jeronimo", last: "CASANOVA", pos: "Ala", primaryCat: "PRE F" },
+      { first: "Rafael", last: "CASANOVA", pos: "Segunda línea", primaryCat: "PRE E" },
+      { first: "Rafa", last: "CASANOVA", pos: "Segunda línea", primaryCat: "PRE D" },
+      { first: "Alejo", last: "CENTURION", pos: "Hooker", primaryCat: "PRE D" },
+      { first: "Nacho", last: "CLARET", pos: "Wing", primaryCat: "PRE F" },
+      { first: "Ignacio", last: "CLARET", pos: "Wing", primaryCat: "PRE F" },
+      { first: "Tomas", last: "COBO", pos: "Wing", primaryCat: "PRE D" },
+      { first: "Lautaro", last: "CONEJERO", pos: "Ala", primaryCat: "PRE E" },
+      { first: "Lucas", last: "CONTE", pos: "Apertura", primaryCat: "PRE F" },
+      { first: "Ezequiel", last: "CUBILLA", pos: "Ala", primaryCat: "PRE C" },
+      { first: "Francisco", last: "CUEVA", pos: "Ala", primaryCat: "PRE E" },
+      { first: "Francisco", last: "CUEVAS", pos: "Segunda línea", primaryCat: "PRE F" },
+      { first: "Diogenes", last: "DEVOTO", pos: "Medio scrum", primaryCat: "PRE E" },
+      { first: "Coco", last: "DEVOTO", pos: "Medio scrum", primaryCat: "PRE E" },
+      { first: "Marcos", last: "DIARBEKIRIAN", pos: "Pilar", primaryCat: "PRE E" },
+      { first: "Gonzalo", last: "DIAZ", pos: "Centro", primaryCat: "PRE C" },
+      { first: "Gonza", last: "DIAZ", pos: "Centro", primaryCat: "PRE E" },
+      { first: "Tomas", last: "DIAZLUZZI", pos: "Full back", primaryCat: "PRE D" },
+      { first: "Joaco", last: "DILLON", pos: "Apertura", primaryCat: "PRE E" },
+      { first: "Joaquin", last: "DILLON", pos: "Apertura", primaryCat: "PRE D" },
+      { first: "Santiago", last: "FRAGA", pos: "Apertura", primaryCat: "PRE E" },
+      { first: "Dante", last: "FRANGELLA", pos: "Hooker", primaryCat: "M22" },
+      { first: "Dante", last: "FRANGIELLA", pos: "Hooker", primaryCat: "PRE E" },
+      { first: "Juan", last: "GARCIA", pos: "Pilar", primaryCat: "PRE D" },
+      { first: "Cruz", last: "GEBARA", pos: "Centro", primaryCat: "PRE F" },
+      { first: "Gonzalo", last: "GILLIGAN", pos: "Wing", primaryCat: "PRE F" },
+      { first: "Pedro", last: "GIRINI", pos: "Pilar", primaryCat: "PRE D" },
+      { first: "Laureano", last: "GONZALEZ", pos: "Medio scrum", primaryCat: "PRE G" },
+      { first: "Facundo", last: "GUERRERO", pos: "Wing", primaryCat: "PRE D" },
+      { first: "Lucas", last: "GUIÑAZU", pos: "Wing", primaryCat: "PRE C" },
+      { first: "Manuel", last: "ISLA CASARES", pos: "Hooker", primaryCat: "PRE G" },
+      { first: "Santos", last: "IZE", pos: "Apertura", primaryCat: "PRE F" },
+      { first: "Joaquin", last: "KELLY", pos: "Full back", primaryCat: "PRE E" },
+      { first: "Justo", last: "LANUSSE", pos: "Centro", primaryCat: "PRE F" },
+      { first: "Teo", last: "LOMBARDO", pos: "Octavo", primaryCat: "PRE F" },
+      { first: "Corcho", last: "LUCINI", pos: "Octavo", primaryCat: "PRE E" },
+      { first: "Bautista", last: "LUCINI", pos: "Octavo", primaryCat: "PRE F" },
+      { first: "Juan Martin", last: "MAINE", pos: "Hooker", primaryCat: "PRE E" },
+      { first: "Fran", last: "MAINE", pos: "Segunda línea", primaryCat: "PRE D" },
+      { first: "Francisco", last: "MAINE", pos: "Segunda línea", primaryCat: "PRE E" },
+      { first: "Juan", last: "MAINE", pos: "Ala", primaryCat: "PRE E" },
+      { first: "Fabricio", last: "MONTANUCCI", pos: "Segunda línea", primaryCat: "PRE E" },
+      { first: "Fabriccio", last: "MONTANUCCI", pos: "Segunda línea", primaryCat: "PRE E" },
+      { first: "Lucas", last: "MUGHERLI", pos: "Centro", primaryCat: "PRE F" },
+      { first: "Pedro", last: "NIES", pos: "Ala", primaryCat: "PRE F" },
+      { first: "Perdo", last: "NIES", pos: "Octavo", primaryCat: "PRE E" },
+      { first: "Facundo", last: "ORMEÑO", pos: "Pilar", primaryCat: "PRE F" },
+      { first: "Martin", last: "OTONDO", pos: "Ala", primaryCat: "M22" },
+      { first: "Facundo", last: "OTTONDO", pos: "Segunda línea", primaryCat: "PRE E" },
+      { first: "Salvador", last: "PAGANO", pos: "Wing", primaryCat: "PRE E" },
+      { first: "Jonas", last: "PALMA", pos: "Segunda línea", primaryCat: "PRE D" },
+      { first: "Manuel", last: "PIETRA", pos: "Medio scrum", primaryCat: "PRE D" },
+      { first: "Jonas", last: "RIFNER", pos: "Centro", primaryCat: "PRE E" },
+      { first: "Tadeo", last: "RIFNER", pos: "Centro", primaryCat: "PRE D" },
+      { first: "Santiago", last: "ROMANO", pos: "Octavo", primaryCat: "PRE D" },
+      { first: "Facundo", last: "ROMERO", pos: "Pilar", primaryCat: "M22" },
+      { first: "Francisco", last: "ROSAS", pos: "Pilar", primaryCat: "PRE D" },
+      { first: "Tomas", last: "SALADINO", pos: "Segunda línea", primaryCat: "PRE G" },
+      { first: "Federico", last: "SANTACRUZ", pos: "Pilar", primaryCat: "PRE E" },
+      { first: "Max", last: "SCHIMDT", pos: "Octavo", primaryCat: "PRE E" },
+      { first: "Francisco", last: "SEGURA", pos: "Full back", primaryCat: "PRE E" },
+      { first: "Fran", last: "SEGURA", pos: "Full back", primaryCat: "PRE D" },
+      { first: "Benicio", last: "SHIRADO", pos: "Ala", primaryCat: "M22" },
+      { first: "Bautista", last: "SOUBRIE", pos: "Segunda línea", primaryCat: "PRE E" },
+      { first: "Mateo", last: "SUPPICICH", pos: "Wing", primaryCat: "PRE E" },
+      { first: "Juan Manuel", last: "VARELA", pos: "Ala", primaryCat: "PRE E" },
+      { first: "Juan", last: "VARELA", pos: "Ala", primaryCat: "PRE E" },
+      { first: "Facundo", last: "VARELA", pos: "Octavo", primaryCat: "PRE E" },
+      { first: "Francisco", last: "VENIER", pos: "Centro", primaryCat: "PRE D" },
+      { first: "Beltran", last: "VIOLA", pos: "Full back", primaryCat: "PRE D" },
+      { first: "Vicente", last: "WAGENER", pos: "Centro", primaryCat: "PRE G" },
+      { first: "Juan Pablo", last: "ZICARELLI", pos: "Octavo", primaryCat: "PRE D" },
+    ] },
+    { id: "pref", label: "Pre F", games: 18, players: [
+      { first: "Santiago", last: "ADARO", pos: "Segunda línea", primaryCat: "PRE F" },
+      { first: "Pedro", last: "ALDUNCIN", pos: "Pilar", primaryCat: "PRE F" },
+      { first: "Tomas", last: "ANCHORENA", pos: "Ala", primaryCat: "PRE F" },
+      { first: "Pela", last: "BALLESTER", pos: "Full back", primaryCat: "PRE F" },
+      { first: "Manuel", last: "BALLESTER", pos: "Apertura", primaryCat: "PRE E" },
+      { first: "Mateo", last: "BENITEZ", pos: "Pilar", primaryCat: "PRE E" },
+      { first: "Valentin", last: "BONATO", pos: "Centro", primaryCat: "PRE E" },
+      { first: "Matias", last: "BONAZZOLA", pos: "Apertura", primaryCat: "PRE F" },
+      { first: "Dylan", last: "BUSTAMANTE", pos: "Pilar", primaryCat: "PRE F" },
+      { first: "Lopez", last: "CABEZAS", pos: "Octavo", primaryCat: "PRE F" },
+      { first: "Santiago", last: "CABRAL", pos: "Ala", primaryCat: "PRE F" },
+      { first: "Agus", last: "CABRAL", pos: "Wing", primaryCat: "PRE F" },
+      { first: "Agustin", last: "CABRAL", pos: "Wing", primaryCat: "PRE G" },
+      { first: "Ignacio", last: "CABRAL", pos: "Hooker", primaryCat: "PRE F" },
+      { first: "Bautista", last: "CANALS", pos: "Wing", primaryCat: "PRE F" },
+      { first: "Facundo", last: "CARIDI", pos: "Segunda línea", primaryCat: "PRE F" },
+      { first: "Santiago", last: "CARRENO", pos: "Pilar", primaryCat: "PRE F" },
+      { first: "Santiago", last: "CARREÑO", pos: "Pilar", primaryCat: "PRE F" },
+      { first: "Rafa", last: "CASANOVA", pos: "Segunda línea", primaryCat: "PRE D" },
+      { first: "Jeronimo", last: "CASANOVA", pos: "Ala", primaryCat: "PRE F" },
+      { first: "Rafael", last: "CASANOVA", pos: "Segunda línea", primaryCat: "PRE E" },
+      { first: "Aleja", last: "CENTURION", pos: "Hooker", primaryCat: "PRE F" },
+      { first: "Alejandro", last: "CENTURION", pos: "Hooker", primaryCat: "PRE F" },
+      { first: "Nacho", last: "CLARET", pos: "Wing", primaryCat: "PRE F" },
+      { first: "Ignacio", last: "CLARET", pos: "Wing", primaryCat: "PRE F" },
+      { first: "Tomas", last: "COBO", pos: "Wing", primaryCat: "PRE D" },
+      { first: "Lautaro", last: "CONEJERO", pos: "Ala", primaryCat: "PRE E" },
+      { first: "Lucas", last: "CONTE", pos: "Apertura", primaryCat: "PRE F" },
+      { first: "Francisco", last: "COSTA", pos: "Pilar", primaryCat: "PRE F" },
+      { first: "Francisco", last: "CUEVA", pos: "Ala", primaryCat: "PRE E" },
+      { first: "Francisco", last: "CUEVAS", pos: "Segunda línea", primaryCat: "PRE F" },
+      { first: "Federico", last: "DE SANTACRUZ", pos: "Pilar", primaryCat: "PRE F" },
+      { first: "Diogenes", last: "DEVOTO", pos: "Medio scrum", primaryCat: "PRE E" },
+      { first: "Marcos", last: "DIARBEKIRIAN", pos: "Pilar", primaryCat: "PRE E" },
+      { first: "Tomas", last: "DIAZLUZZI", pos: "Full back", primaryCat: "PRE D" },
+      { first: "Chesco", last: "FERREIRO", pos: "Medio scrum", primaryCat: "PRE F" },
+      { first: "Francisco", last: "FERREIRO", pos: "Medio scrum", primaryCat: "PRE G" },
+      { first: "Dante", last: "FRANGELLA", pos: "Hooker", primaryCat: "M22" },
+      { first: "Juan", last: "GARCIA", pos: "Pilar", primaryCat: "PRE D" },
+      { first: "Cruz", last: "GEBARA", pos: "Centro", primaryCat: "PRE F" },
+      { first: "Gonzalo", last: "GILLIGAN", pos: "Wing", primaryCat: "PRE F" },
+      { first: "Tiger", last: "GIRINI", pos: "Pilar", primaryCat: "PRE F" },
+      { first: "Laureano", last: "GONZALES", pos: "Medio scrum", primaryCat: "PRE F" },
+      { first: "Laureano", last: "GONZALEZ", pos: "Medio scrum", primaryCat: "PRE G" },
+      { first: "Bautista", last: "GONZALEZ QUEZNEL", pos: "Full back", primaryCat: "PRE F" },
+      { first: "Facundo", last: "GUERRERO", pos: "Wing", primaryCat: "PRE D" },
+      { first: "Cruz", last: "GUEVARA", pos: "Centro", primaryCat: "PRE F" },
+      { first: "Lucas", last: "GUIÑAZU", pos: "Wing", primaryCat: "PRE C" },
+      { first: "Manuel", last: "ISLA CACERES", pos: "Hooker", primaryCat: "PRE F" },
+      { first: "Manolo", last: "ISLA CASARES", pos: "Hooker", primaryCat: "PRE F" },
+      { first: "Santos", last: "IZE", pos: "Apertura", primaryCat: "PRE F" },
+      { first: "Joaquin", last: "KELLY", pos: "Full back", primaryCat: "PRE E" },
+      { first: "Cruz", last: "LANUSSE", pos: "Wing", primaryCat: "PRE F" },
+      { first: "Justo", last: "LANUSSE", pos: "Centro", primaryCat: "PRE F" },
+      { first: "Francisco", last: "LATORRE", pos: "Centro", primaryCat: "PRE F" },
+      { first: "Teo", last: "LOMBARDO", pos: "Octavo", primaryCat: "PRE F" },
+      { first: "Santiago", last: "LOPEZ CABEZA", pos: "Octavo", primaryCat: "PRE G" },
+      { first: "Santiago", last: "LOPEZ CABEZAS", pos: "Ala", primaryCat: "PRE F" },
+      { first: "Santiago", last: "LUCCINI", pos: "Octavo", primaryCat: "PRE F" },
+      { first: "Bautista", last: "LUCINI", pos: "Octavo", primaryCat: "PRE F" },
+      { first: "Francisco", last: "MAINE", pos: "Segunda línea", primaryCat: "PRE E" },
+      { first: "Fran", last: "MAINE", pos: "Segunda línea", primaryCat: "PRE D" },
+      { first: "Juan", last: "MAINE", pos: "Ala", primaryCat: "PRE E" },
+      { first: "Mateo", last: "MAJDA", pos: "Octavo", primaryCat: "PRE F" },
+      { first: "Mateo", last: "MAJDALANI", pos: "Segunda línea", primaryCat: "PRE F" },
+      { first: "Fabricio", last: "MONTANNUCI", pos: "Segunda línea", primaryCat: "PRE G" },
+      { first: "Fabricio", last: "MONTANUCCI", pos: "Segunda línea", primaryCat: "PRE E" },
+      { first: "Mauricio", last: "MONTANUCII", pos: "Segunda línea", primaryCat: "PRE F" },
+      { first: "Baltazar", last: "MOUSO", pos: "Hooker", primaryCat: "PRE F" },
+      { first: "Jeronimo", last: "MOYANO", pos: "Ala", primaryCat: "PRE F" },
+      { first: "Lucas", last: "MUGHERLI", pos: "Centro", primaryCat: "PRE F" },
+      { first: "Pedro", last: "NIES", pos: "Ala", primaryCat: "PRE F" },
+      { first: "Carlos", last: "OLMOS", pos: "Ala", primaryCat: "PRE F" },
+      { first: "Facundo", last: "ORMEÑO", pos: "Pilar", primaryCat: "PRE F" },
+      { first: "Salvador", last: "PAGANO", pos: "Wing", primaryCat: "PRE E" },
+      { first: "Jonas", last: "PALMA", pos: "Segunda línea", primaryCat: "PRE D" },
+      { first: "Lucas", last: "PALOMEQUE", pos: "Pilar", primaryCat: "PRE F" },
+      { first: "Bautista", last: "QUESNEL", pos: "Wing", primaryCat: "M22" },
+      { first: "Jonas", last: "RIFNER", pos: "Centro", primaryCat: "PRE E" },
+      { first: "Tadeo", last: "RIFNER", pos: "Centro", primaryCat: "PRE D" },
+      { first: "Agustin", last: "RIVERO", pos: "Centro", primaryCat: "PRE F" },
+      { first: "Juan", last: "RODRIGUEZ", pos: "Pilar", primaryCat: "PRE F" },
+      { first: "Santiago", last: "ROMANO", pos: "Octavo", primaryCat: "PRE D" },
+      { first: "Facundo", last: "ROMERO", pos: "Pilar", primaryCat: "M22" },
+      { first: "Francisco", last: "ROSAS", pos: "Pilar", primaryCat: "PRE D" },
+      { first: "Tomas", last: "SALADINO", pos: "Segunda línea", primaryCat: "PRE G" },
+      { first: "Federico", last: "SANTACRUZ", pos: "Pilar", primaryCat: "PRE E" },
+      { first: "Francisco", last: "SEGURA", pos: "Full back", primaryCat: "PRE E" },
+      { first: "Tomas", last: "SEVERO", pos: "Medio scrum", primaryCat: "PRE F" },
+      { first: "Benicio", last: "SHIRADO", pos: "Ala", primaryCat: "M22" },
+      { first: "Nicolas", last: "SOSA", pos: "Hooker", primaryCat: "PRE F" },
+      { first: "Bautista", last: "SOUBRIE", pos: "Segunda línea", primaryCat: "PRE E" },
+      { first: "Felipe", last: "STAFFORINI", pos: "Full back", primaryCat: "PRE G" },
+      { first: "Mateo", last: "SUPPICICH", pos: "Wing", primaryCat: "PRE E" },
+      { first: "Juan Manuel", last: "VARELA", pos: "Ala", primaryCat: "PRE E" },
+      { first: "Francisco", last: "VENIER", pos: "Centro", primaryCat: "PRE D" },
+      { first: "Beltran", last: "VIOLA", pos: "Full back", primaryCat: "PRE D" },
+      { first: "Vicente", last: "WAGENER", pos: "Centro", primaryCat: "PRE G" },
+      { first: "Vicente", last: "WAGNER", pos: "Wing", primaryCat: "PRE G" },
+      { first: "Juan Pablo", last: "ZICARELLI", pos: "Octavo", primaryCat: "PRE D" },
+    ] },
+    { id: "preg", label: "Pre G", games: 6, players: [
+      { first: "Santiago", last: "ADARO", pos: "Segunda línea", primaryCat: "PRE F" },
+      { first: "Tomas", last: "ANCHORENA", pos: "Ala", primaryCat: "PRE F" },
+      { first: "Valentino", last: "BONATO", pos: "Centro", primaryCat: "PRE E" },
+      { first: "Valentin", last: "BONATO", pos: "Centro", primaryCat: "PRE E" },
+      { first: "Valen", last: "BONATO", pos: "Wing", primaryCat: "PRE G" },
+      { first: "Matias", last: "BONAZZOLA", pos: "Apertura", primaryCat: "PRE F" },
+      { first: "Dylan", last: "BUSTAMANTE", pos: "Pilar", primaryCat: "PRE F" },
+      { first: "Dyllan", last: "BUSTAMANTE", pos: "Segunda línea", primaryCat: "PRE G" },
+      { first: "Agustin", last: "CABRAL", pos: "Wing", primaryCat: "PRE G" },
+      { first: "Ignacio", last: "CABRAL", pos: "Hooker", primaryCat: "PRE F" },
+      { first: "Santiago", last: "CARREÑO", pos: "Pilar", primaryCat: "PRE F" },
+      { first: "Jeronimo", last: "CASANOVA", pos: "Ala", primaryCat: "PRE F" },
+      { first: "Alejo", last: "CENTURION", pos: "Hooker", primaryCat: "PRE D" },
+      { first: "Ignacio", last: "CLARET", pos: "Wing", primaryCat: "PRE F" },
+      { first: "Francisco", last: "CUEVA", pos: "Ala", primaryCat: "PRE E" },
+      { first: "Marcos", last: "DIARBEKIRIAN", pos: "Pilar", primaryCat: "PRE E" },
+      { first: "Facundo", last: "DOGUEL", pos: "Pilar", primaryCat: "PRE G" },
+      { first: "Francisco", last: "FERREIRO", pos: "Medio scrum", primaryCat: "PRE G" },
+      { first: "Juan", last: "GARCIA", pos: "Pilar", primaryCat: "PRE D" },
+      { first: "Cruz", last: "GEBARA", pos: "Centro", primaryCat: "PRE F" },
+      { first: "Gonzalo", last: "GILLIGAN", pos: "Wing", primaryCat: "PRE F" },
+      { first: "Laureano", last: "GONZALEZ", pos: "Medio scrum", primaryCat: "PRE G" },
+      { first: "Cruz", last: "GUEVARA", pos: "Centro", primaryCat: "PRE F" },
+      { first: "Manuel", last: "ISLA CASARES", pos: "Hooker", primaryCat: "PRE G" },
+      { first: "Manuel", last: "ISLAS CASARES", pos: "Hooker", primaryCat: "PRE G" },
+      { first: "Santos", last: "IZE", pos: "Apertura", primaryCat: "PRE F" },
+      { first: "Joaco", last: "KELLY", pos: "Apertura", primaryCat: "PRE G" },
+      { first: "Cruz", last: "LANUSSE", pos: "Wing", primaryCat: "PRE F" },
+      { first: "Lorenzo", last: "LOMANTO", pos: "Wing", primaryCat: "PRE G" },
+      { first: "Teo", last: "LOMBARDO", pos: "Octavo", primaryCat: "PRE F" },
+      { first: "Santiago", last: "LOPEZ CABEZA", pos: "Octavo", primaryCat: "PRE G" },
+      { first: "Mateo", last: "MAJDALANI", pos: "Segunda línea", primaryCat: "PRE F" },
+      { first: "Fabricio", last: "MONTANNUCI", pos: "Segunda línea", primaryCat: "PRE G" },
+      { first: "Lucas", last: "MUGHERLI", pos: "Centro", primaryCat: "PRE F" },
+      { first: "Carlos", last: "OLMOS", pos: "Ala", primaryCat: "PRE F" },
+      { first: "Santiago", last: "PINEDA", pos: "Pilar", primaryCat: "PRE G" },
+      { first: "Jonas", last: "RIFNER", pos: "Centro", primaryCat: "PRE E" },
+      { first: "Agustin", last: "RIVERO", pos: "Centro", primaryCat: "PRE F" },
+      { first: "Juan", last: "RODRIGUEZ", pos: "Pilar", primaryCat: "PRE F" },
+      { first: "Tomas", last: "SALADINO", pos: "Segunda línea", primaryCat: "PRE G" },
+      { first: "Tomas", last: "SEVERO", pos: "Medio scrum", primaryCat: "PRE F" },
+      { first: "Nicolas", last: "SOSA", pos: "Hooker", primaryCat: "PRE F" },
+      { first: "Felipe", last: "STAFFORINI", pos: "Full back", primaryCat: "PRE G" },
+      { first: "Juan Manuel", last: "VARELA", pos: "Ala", primaryCat: "PRE E" },
+      { first: "Vicente", last: "WAGENER", pos: "Centro", primaryCat: "PRE G" },
+      { first: "Vicente", last: "WAGNER", pos: "Wing", primaryCat: "PRE G" },
+    ] },
+  ];
+
+  const MAX_ATTEMPTS = 6;
+  let currentTeamId = "club";
+  let pool = [], target = null, targetNorm = "", cols = 6;
+  let guesses = [], rowStates = [], current = "", finished = false, keyBestState = {};
+  const HINT_STEPS = { pos: 2, team: 3, letter: 4 };
+  let hintLetterIndex = -1, editableIndices = [];
+
+  const boardEl = document.getElementById("board");
+  const messageEl = document.getElementById("message");
+  const keyboardEl = document.getElementById("keyboard");
+  const teamSelectEl = document.getElementById("teamSelect");
+  const revealCard = document.getElementById("revealCard");
+  const revealEyebrow = document.getElementById("revealEyebrow");
+  const revealName = document.getElementById("revealName");
+  const revealMeta = document.getElementById("revealMeta");
+  const statsBody = document.getElementById("statsBody");
+  const shareBox = document.getElementById("shareBox");
+  const hintsEl = document.getElementById("hints");
+
+  /* ── localStorage history ─────────────────────────────── */
+  function loadHistory() {
+    try { return JSON.parse(localStorage.getItem("alumni-wordle-h") || "{}"); } catch { return {}; }
+  }
+  function saveHistory(h) {
+    try { localStorage.setItem("alumni-wordle-h", JSON.stringify(h)); } catch {}
+  }
+  function recordResult(won, attempts, catKey) {
+    const h = loadHistory();
+    h.played = (h.played || 0) + 1;
+    if (won) {
+      h.won = (h.won || 0) + 1;
+      h.streak = (h.streak || 0) + 1;
+      h.best = Math.max(h.best || 0, h.streak);
+      if (!h.dist) h.dist = {};
+      h.dist[attempts] = (h.dist[attempts] || 0) + 1;
+      if (catKey) { if (!h.cats) h.cats = {}; h.cats[catKey] = (h.cats[catKey] || 0) + 1; }
+    } else {
+      h.streak = 0;
+    }
+    saveHistory(h);
+    return h;
+  }
+
+  function normalize(str) {
+    return str.toUpperCase().split("").map(function(ch) {
+      if (ch === "Ñ") return ch;
+      return ch.normalize("NFD").replace(/[̀-ͯ]/g, "");
+    }).join("");
+  }
+
+  function uniqueByLast(arr) {
+    const seen = new Set();
+    return arr.filter(p => { const k = p.last; if (seen.has(k)) return false; seen.add(k); return true; });
+  }
+
+  function poolFor(teamId) {
+    let raw;
+    if (teamId === "club") {
+      raw = TEAMS.flatMap(t => t.players.map(p => ({ ...p, teamLabel: t.label })));
+    } else {
+      const team = TEAMS.find(t => t.id === teamId);
+      if (!team) { raw = []; }
+      else {
+        // Find the CAT_LABEL key that corresponds to this team
+        const catKey = Object.keys(CAT_LABEL).find(function(k){ return CAT_LABEL[k] === team.label; });
+        // Only show players whose primary category matches the selected team
+        const filtered = catKey ? team.players.filter(function(p){ return p.primaryCat === catKey; }) : [];
+        // Fallback to full team list if not enough primary players
+        raw = (filtered.length >= 5 ? filtered : team.players).map(function(p){ return Object.assign({}, p, { teamLabel: team.label }); });
+      }
+    }
+    return uniqueByLast(raw);
+  }
+
+  function buildDropdown() {
+    teamSelectEl.innerHTML = "";
+    const addOpt = (value, text) => {
+      const opt = document.createElement("option");
+      opt.value = value; opt.textContent = text; opt.selected = value === currentTeamId;
+      teamSelectEl.appendChild(opt);
+    };
+    addOpt("club", "Todo el club (" + poolFor("club").length + ")");
+    TEAMS.forEach(t => { addOpt(t.id, t.label + " (" + uniqueByLast(t.players).length + ")"); });
+    teamSelectEl.onchange = () => { currentTeamId = teamSelectEl.value; startGame(); };
+  }
+
+  function buildStats() {
+    const clubCount = poolFor("club").length;
+    const el = document.getElementById("totalPlayersInline");
+    if (el) el.textContent = clubCount;
+    if (!statsBody) return;
+
+    /* ── Category cards ── */
+    statsBody.innerHTML = "";
+    function goTo(id) {
+      return function() { currentTeamId = id; buildDropdown(); startGame(); window.scrollTo({ top: 0, behavior: "smooth" }); };
+    }
+    const totalCard = document.createElement("div");
+    totalCard.className = "cat-card cat-total-card";
+    totalCard.innerHTML =
+      "<div class='cat-card-label'>Todo el club</div>" +
+      "<div class='cat-card-nums'><span class='cat-card-count'>" + clubCount + "</span><span class='cat-card-unit'>jugadores</span></div>" +
+      "<div class='cat-card-dates'>19 fechas · 10 categorías</div>";
+    totalCard.addEventListener("click", goTo("club"));
+    statsBody.appendChild(totalCard);
+    TEAMS.forEach(function(t) {
+      const cnt = uniqueByLast(t.players).length;
+      const card = document.createElement("div");
+      card.className = "cat-card";
+      card.style.setProperty("--cat-color", CAT_COLORS[t.id] || "var(--red)");
+      card.innerHTML =
+        "<div class='cat-card-label'>" + t.label + "</div>" +
+        "<div class='cat-card-nums'><span class='cat-card-count'>" + cnt + "</span><span class='cat-card-unit'>jugadores</span></div>" +
+        "<div class='cat-card-dates'>" + (t.games || 0) + " fechas</div>";
+      card.addEventListener("click", goTo(t.id));
+      statsBody.appendChild(card);
+    });
+
+    /* ── Fun facts ── */
+    const ffEl = document.getElementById("funfactsEl");
+    if (!ffEl) return;
+    const firstCounts = {};
+    TEAMS.forEach(function(t) { t.players.forEach(function(p) { const n = p.first.split(" ")[0]; firstCounts[n] = (firstCounts[n]||0)+1; }); });
+    const topFirst = Object.entries(firstCounts).sort(function(a,b){ return b[1]-a[1]; })[0] || ["—",0];
+    const posCounts = {};
+    poolFor("club").forEach(function(p){ posCounts[p.pos] = (posCounts[p.pos]||0)+1; });
+    const topPos = Object.entries(posCounts).sort(function(a,b){ return b[1]-a[1]; })[0] || ["—",0];
+    const lastToCats = {};
+    TEAMS.forEach(function(t){ const seen=new Set(); t.players.forEach(function(p){ if(!seen.has(p.last)){seen.add(p.last);lastToCats[p.last]=(lastToCats[p.last]||0)+1;} }); });
+    const versatile = Object.values(lastToCats).filter(function(n){ return n>=3; }).length;
+    const longest = poolFor("club").reduce(function(best,p){ const c=p.last.replace(/ /g,""); return c.length>(best.replace(/ /g,"").length)?p.last:best; },"");
+    ffEl.innerHTML =
+      "<div class='ff-item'><div class='ff-label'>Nombre más común</div><div class='ff-value'>" + topFirst[0] + "</div><div class='ff-sub'>" + topFirst[1] + " jugadores</div></div>" +
+      "<div class='ff-item'><div class='ff-label'>Puesto más representado</div><div class='ff-value'>" + topPos[0] + "</div><div class='ff-sub'>" + topPos[1] + " jugadores</div></div>" +
+      "<div class='ff-item'><div class='ff-label'>Apellido más largo</div><div class='ff-value' style='font-size:0.82rem;font-weight:700;font-family:Barlow,sans-serif'>" + longest + "</div><div class='ff-sub'>" + longest.replace(/ /g,"").length + " letras</div></div>" +
+      "<div class='ff-item'><div class='ff-label'>Jugadores multifunción</div><div class='ff-value'>" + versatile + "</div><div class='ff-sub'>en 3 o más categorías</div></div>" +
+      "<div class='ff-item'><div class='ff-label'>Categorías</div><div class='ff-value'>10</div><div class='ff-sub'>de Pre G a Primera</div></div>" +
+      "<div class='ff-item'><div class='ff-label'>Temporada</div><div class='ff-value'>2026</div><div class='ff-sub'>Top 14 URBA · 19 fechas</div></div>";
+  }
+
+  function populateModal() {
+    const h = loadHistory();
+    const pct = h.played > 0 ? Math.round((h.won || 0) / h.played * 100) : 0;
+    document.getElementById("modalHistory").innerHTML =
+      "<div class='mh-item'><div class='mh-num'>" + (h.played||0) + "</div><div class='mh-lbl'>Partidas</div></div>" +
+      "<div class='mh-item'><div class='mh-num'>" + pct + "%</div><div class='mh-lbl'>Victorias</div></div>" +
+      "<div class='mh-item'><div class='mh-num'>" + (h.streak||0) + "</div><div class='mh-lbl'>Racha</div></div>" +
+      "<div class='mh-item'><div class='mh-num'>" + (h.best||0) + "</div><div class='mh-lbl'>Mejor racha</div></div>";
+
+    const dist = h.dist || {};
+    const maxVal = Math.max(1, ...Object.values(dist));
+    const lastWon = h.played > 0 && h.streak > 0;
+    const distEl = document.getElementById("modalDist");
+    distEl.innerHTML = "";
+    for (var i = 1; i <= 6; i++) {
+      const v = dist[i] || 0;
+      const w = Math.max(5, Math.round(v / maxVal * 100));
+      const row = document.createElement("div"); row.className = "dist-row";
+      row.innerHTML = "<span class='dist-num'>" + i + "</span><div class='dist-bar-wrap'><div class='dist-bar' style='width:" + w + "%'>" + v + "</div></div>";
+      distEl.appendChild(row);
+    }
+
+    const cats = h.cats || {};
+    const catEntries = Object.entries(cats).sort(function(a,b){ return b[1]-a[1]; }).slice(0, 6);
+    const catsLabel = document.getElementById("modalCatsLabel");
+    const catsEl = document.getElementById("modalCats");
+    if (catEntries.length > 0) {
+      catsLabel.style.display = "";
+      catsEl.innerHTML = catEntries.map(function(e) {
+        return "<div class='cats-row'><span class='cats-name'>" + (CAT_LABEL[e[0]] || e[0]) + "</span><span class='cats-wins'>" + e[1] + " ✓</span></div>";
+      }).join("");
+    } else {
+      catsLabel.style.display = "none";
+      catsEl.innerHTML = "";
+    }
+  }
+
+  function pickTarget() {
+    const candidates = pool.filter(p => normalize(p.last).replace(/ /g,"").length >= 3);
+    if (!candidates.length) return null;
+    return candidates[Math.floor(Math.random() * candidates.length)];
+  }
+
+  function startGame() {
+    pool = poolFor(currentTeamId);
+    target = pickTarget();
+    finished = false; guesses = []; rowStates = []; current = ""; keyBestState = {};
+    hintLetterIndex = -1;
+    revealCard.hidden = true;
+    shareBox.dataset.visible = "false"; shareBox.textContent = "";
+    setMessage(""); hintsEl.innerHTML = "";
+    if (!target) { cols = 6; boardEl.innerHTML = ""; setMessage("Esta categoría no tiene jugadores."); renderKeyboard(); return; }
+    targetNorm = normalize(target.last);
+    cols = targetNorm.length;
+    editableIndices = [];
+    for (let i = 0; i < cols; i++) { if (targetNorm[i] !== " ") editableIndices.push(i); }
+    hintLetterIndex = editableIndices.length > 1
+      ? editableIndices[1 + Math.floor(Math.random() * (editableIndices.length - 1))]
+      : (editableIndices[0] ?? -1);
+    boardEl.style.setProperty("--cols", cols);
+    sizeTiles(); renderBoard(); renderKeyboard();
+  }
+
+  function renderHints() {
+    hintsEl.innerHTML = "";
+    const used = guesses.length;
+    const add = (label, value) => {
+      const chip = document.createElement("div");
+      chip.className = "hint-chip";
+      chip.innerHTML = "<span class=\"k\">" + label + "</span><span class=\"v\"></span>";
+      chip.querySelector(".v").textContent = value;
+      hintsEl.appendChild(chip);
+    };
+    if (used >= HINT_STEPS.pos) add("Puesto", target.pos);
+    if (used >= HINT_STEPS.team) {
+      let catDisplay;
+      if (currentTeamId === "club") {
+        const cat = target.primaryCat || "";
+        catDisplay = CAT_LABEL[cat] || cat;
+      } else {
+        const team = TEAMS.find(function(t){ return t.id === currentTeamId; });
+        catDisplay = team ? team.label : "";
+      }
+      add("Categoría", catDisplay);
+    }
+    if (used >= HINT_STEPS.letter) {
+      const plain = targetNorm.replace(/ /g, "");
+      if (COMPOUND_HINT.has(plain)) {
+        add("Pista", "Son dos palabras");
+      } else if (hintLetterIndex >= 0) {
+        add("Letra " + (hintLetterIndex + 1), targetNorm[hintLetterIndex]);
+      }
+    }
+  }
+
+  function sizeTiles() {
+    const maxWidth = Math.min(480, window.innerWidth - 32);
+    const tile = Math.max(30, Math.min(52, Math.floor((maxWidth - (cols-1)*7) / cols)));
+    boardEl.style.setProperty("--tile", tile + "px");
+  }
+  window.addEventListener("resize", () => { if (target) sizeTiles(); });
+
+  function expandCurrent() {
+    let out = "", k = 0;
+    for (let i = 0; i < cols; i++) {
+      if (targetNorm[i] === " ") { out += " "; } else { out += current[k] || ""; k++; }
+    }
+    return out;
+  }
+
+  function renderBoard() {
+    boardEl.innerHTML = "";
+    for (let r = 0; r < MAX_ATTEMPTS; r++) {
+      const committed = guesses[r];
+      const word = r === guesses.length ? expandCurrent() : (committed || "");
+      for (let c = 0; c < cols; c++) {
+        const tile = document.createElement("div");
+        tile.className = "tile";
+        if (targetNorm[c] === " ") { tile.dataset.state = "space"; boardEl.appendChild(tile); continue; }
+        const letter = word[c] || "";
+        tile.textContent = letter;
+        if (letter) tile.dataset.filled = "true";
+        if (committed && rowStates[r]) tile.dataset.state = rowStates[r][c];
+        boardEl.appendChild(tile);
+      }
+    }
+  }
+
+  function setMessage(text, isError) {
+    messageEl.textContent = text || "";
+    messageEl.className = "message" + (isError ? " error" : "");
+  }
+
+  const ROWS = ["QWERTYUIOP".split(""), "ASDFGHJKLÑ".split(""), ["ENTER", ..."ZXCVBNM".split(""), "⌫"]];
+  function renderKeyboard() {
+    keyboardEl.innerHTML = "";
+    ROWS.forEach(row => {
+      const krow = document.createElement("div"); krow.className = "krow";
+      row.forEach(k => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "key" + (k === "ENTER" || k === "⌫" ? " wide" : "");
+        btn.textContent = k;
+        if (k.length === 1 && keyBestState[k]) btn.dataset.state = keyBestState[k];
+        btn.addEventListener("click", () => handleKey(k === "ENTER" ? "Enter" : k === "⌫" ? "Backspace" : k));
+        krow.appendChild(btn);
+      });
+      keyboardEl.appendChild(krow);
+    });
+  }
+
+  function handleKey(key) {
+    if (finished || !target) return;
+    if (key === "Enter") return submitGuess();
+    if (key === "Backspace") { current = current.slice(0, -1); renderBoard(); return; }
+    if (/^[A-ZÑ]$/.test(key) && current.length < editableIndices.length) { current += key; renderBoard(); }
+  }
+
+  document.addEventListener("keydown", (e) => {
+    if (finished || !target) return;
+    if (e.key === "Enter") return handleKey("Enter");
+    if (e.key === "Backspace") return handleKey("Backspace");
+    const k = normalize(e.key || "");
+    if (/^[A-ZÑ]$/.test(k) && k.length === 1) handleKey(k);
+  });
+
+  function evaluate(guess, answer) {
+    const states = new Array(guess.length).fill("absent");
+    const counts = {};
+    for (const ch of answer) counts[ch] = (counts[ch] || 0) + 1;
+    for (let i = 0; i < guess.length; i++) {
+      if (guess[i] === answer[i]) { states[i] = "correct"; counts[guess[i]]--; }
+    }
+    for (let i = 0; i < guess.length; i++) {
+      if (states[i] === "correct") continue;
+      const ch = guess[i];
+      if (counts[ch] > 0) { states[i] = "present"; counts[ch]--; }
+    }
+    return states;
+  }
+
+  function submitGuess() {
+    if (current.length !== editableIndices.length) {
+      setMessage("Te faltan letras (" + current.length + "/" + editableIndices.length + ")", true);
+      boardEl.dataset.shake = "true";
+      setTimeout(() => { boardEl.dataset.shake = "false"; }, 400);
+      return;
+    }
+    const fullGuess = expandCurrent();
+    const states = evaluate(fullGuess, targetNorm);
+    guesses.push(fullGuess); rowStates.push(states);
+    states.forEach((s, i) => {
+      const letter = fullGuess[i];
+      if (letter === " ") return;
+      const rank = { absent: 0, present: 1, correct: 2 };
+      if (!keyBestState[letter] || rank[s] > rank[keyBestState[letter]]) keyBestState[letter] = s;
+    });
+    const won = fullGuess === targetNorm;
+    current = "";
+    renderBoard(); renderKeyboard();
+    if (won) { finished = true; setMessage(""); hintsEl.innerHTML = ""; showReveal(true, guesses.length); }
+    else if (guesses.length >= MAX_ATTEMPTS) { finished = true; setMessage(""); hintsEl.innerHTML = ""; showReveal(false, MAX_ATTEMPTS); }
+    else { setMessage(""); renderHints(); }
+  }
+
+  function showReveal(won, attempts) {
+    revealCard.hidden = false;
+    revealEyebrow.textContent = won ? "¡Lo adivinaste en " + attempts + "/" + MAX_ATTEMPTS + "!" : "Se te acabaron los intentos";
+    revealName.textContent = target.first + " " + target.last;
+    let catDisplay;
+    if (currentTeamId === "club") {
+      const cat = target.primaryCat || "";
+      catDisplay = CAT_LABEL[cat] || cat;
+    } else {
+      const team = TEAMS.find(function(t){ return t.id === currentTeamId; });
+      catDisplay = team ? team.label : (CAT_LABEL[target.primaryCat||""] || target.primaryCat || "");
+    }
+    revealMeta.textContent = target.pos + " — " + catDisplay;
+    shareBox.dataset.visible = "false";
+    shareBox.textContent = buildShareText(won, attempts);
+    setTimeout(function() { revealCard.scrollIntoView({ behavior: "smooth", block: "nearest" }); }, 80);
+    const h = recordResult(won, attempts, target.primaryCat);
+    const histEl = document.getElementById("revealHistory");
+    if (histEl) {
+      const pct = h.played > 0 ? Math.round((h.won || 0) / h.played * 100) : 0;
+      histEl.innerHTML =
+        "<div class='rh-item'><div class='rh-num'>" + h.played + "</div><div class='rh-lbl'>Partidas</div></div>" +
+        "<div class='rh-item'><div class='rh-num'>" + pct + "%</div><div class='rh-lbl'>Victorias</div></div>" +
+        "<div class='rh-item'><div class='rh-num'>" + (h.streak || 0) + "</div><div class='rh-lbl'>Racha</div></div>" +
+        "<div class='rh-item'><div class='rh-num'>" + (h.best || 0) + "</div><div class='rh-lbl'>Mejor racha</div></div>";
+    }
+  }
+
+  function buildShareText(won, attempts) {
+    const selLabel = currentTeamId === "club" ? "Todo el club" : (TEAMS.find(t => t.id === currentTeamId) || {}).label;
+    const lines = ["Apellidos de Alumni — " + (selLabel||"") + " — " + (won ? attempts + "/" + MAX_ATTEMPTS : "X/" + MAX_ATTEMPTS)];
+    rowStates.forEach(states => {
+      const emoji = states.filter((s, i) => targetNorm[i] !== " ").map(s => s === "correct" ? "🟩" : s === "present" ? "🟨" : "⬛").join("");
+      lines.push(emoji);
+    });
+    return lines.join("\n");
+  }
+
+  document.getElementById("playAgainBtn").addEventListener("click", startGame);
+  document.getElementById("changeTeamBtn").addEventListener("click", function() {
+    revealCard.hidden = true;
+    teamSelectEl.scrollIntoView({ behavior: "smooth", block: "center" });
+    setTimeout(function() { teamSelectEl.focus(); }, 350);
+  });
+  document.getElementById("shareBtn").addEventListener("click", async () => {
+    const won = guesses.length > 0 && current === "" && rowStates.length && guesses[guesses.length-1] === targetNorm;
+    const text = buildShareText(won, guesses.length);
+    try { await navigator.clipboard.writeText(text); shareBox.dataset.visible = "true"; setMessage("¡Copiado!"); }
+    catch { shareBox.dataset.visible = "true"; setMessage("Seleccioná el texto de abajo.", true); }
+  });
+
+  /* ── Stats modal ─────────────────────────────────────── */
+  const statsModalEl = document.getElementById("statsModal");
+  const statsBtnEl = document.getElementById("statsBtn");
+  function openStatsModal() { populateModal(); statsModalEl.hidden = false; document.getElementById("statsModalClose").focus(); }
+  function closeStatsModal() { statsModalEl.hidden = true; statsBtnEl.focus(); }
+  statsBtnEl.addEventListener("click", openStatsModal);
+  document.getElementById("statsModalClose").addEventListener("click", closeStatsModal);
+  statsModalEl.addEventListener("click", function(e) { if (e.target === statsModalEl) closeStatsModal(); });
+  document.addEventListener("keydown", function(e) { if (e.key === "Escape" && !statsModalEl.hidden) { closeStatsModal(); e.preventDefault(); } });
+
+  const kickerEl = document.getElementById("kicker");
+  if (kickerEl) kickerEl.textContent = SEASON_LABEL;
+  buildDropdown(); buildStats(); startGame();
+})();
+</script>
