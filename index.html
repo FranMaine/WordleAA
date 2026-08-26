@@ -182,7 +182,15 @@
   <header class="masthead">
     <div class="masthead-top">
       <div class="masthead-text">
-        <div class="kicker" id="kicker">Asociación Alumni · Top 14 URBA 2026</div>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+          <!-- Escudo Alumni SVG -->
+          <svg width="36" height="40" viewBox="0 0 100 115" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M50,2 C50,2 96,10 98,58 C100,94 76,112 50,114 C24,112 0,94 2,58 C4,10 50,2 50,2Z" fill="#d12030" stroke="#111" stroke-width="4"/>
+            <rect x="44" y="2" width="12" height="112" fill="white"/>
+            <text x="50" y="78" text-anchor="middle" font-family="Arial Black,Impact,sans-serif" font-weight="900" font-size="46" fill="#111" letter-spacing="-3">AA</text>
+          </svg>
+          <div class="kicker" id="kicker">Asociación Alumni · Top 14 URBA 2026</div>
+        </div>
         <h1>APELLIDOS<span>el wordle del club</span></h1>
       </div>
       <div class="masthead-right">
@@ -192,20 +200,38 @@
           </svg>
         </button>
         <div class="jersey-deco" aria-hidden="true">
-          <svg viewBox="0 0 100 118" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- Alumni jersey: franjas horizontales rojo/blanco + escudo en el pecho -->
+          <svg viewBox="0 0 120 140" fill="none" xmlns="http://www.w3.org/2000/svg">
             <defs>
-              <clipPath id="jc"><path d="M28,24 L5,40 L17,52 L17,110 L83,110 L83,52 L95,40 L72,24 C68,30 62,34 50,34 C38,34 32,30 28,24Z"/></clipPath>
+              <!-- forma de la camiseta -->
+              <clipPath id="jc2">
+                <path d="M38,10 C36,14 32,18 22,22 L2,34 L2,38 L18,54 L18,56 L14,56 L14,130 L106,130 L106,56 L102,56 L102,54 L118,38 L118,34 L98,22 C88,18 84,14 82,10 C78,16 70,22 60,22 C50,22 42,16 38,10Z"/>
+              </clipPath>
+              <!-- shadow lateral para dar cuerpo -->
             </defs>
-            <!-- white jersey base -->
-            <path d="M28,24 L5,40 L17,52 L17,110 L83,110 L83,52 L95,40 L72,24 C68,30 62,34 50,34 C38,34 32,30 28,24Z" fill="#f5f5f5"/>
-            <g clip-path="url(#jc)">
-              <!-- red hoops — Alumni colors -->
-              <rect x="0" y="33" width="100" height="15" fill="#d12030"/>
-              <rect x="0" y="61" width="100" height="15" fill="#d12030"/>
-              <rect x="0" y="89" width="100" height="15" fill="#d12030"/>
+            <!-- base blanca -->
+            <path d="M38,10 C36,14 32,18 22,22 L2,34 L2,38 L18,54 L18,56 L14,56 L14,130 L106,130 L106,56 L102,56 L102,54 L118,38 L118,34 L98,22 C88,18 84,14 82,10 C78,16 70,22 60,22 C50,22 42,16 38,10Z" fill="#f4f4f4"/>
+            <g clip-path="url(#jc2)">
+              <!-- franjas rojas horizontales (7 franjas visibles como en la foto) -->
+              <rect x="0" y="10"  width="120" height="14" fill="#d12030"/>
+              <rect x="0" y="38"  width="120" height="14" fill="#d12030"/>
+              <rect x="0" y="66"  width="120" height="14" fill="#d12030"/>
+              <rect x="0" y="94"  width="120" height="14" fill="#d12030"/>
+              <rect x="0" y="122" width="120" height="14" fill="#d12030"/>
+              <!-- costura lateral sutil -->
+              <rect x="13"  y="0" width="2" height="140" fill="rgba(0,0,0,0.07)"/>
+              <rect x="105" y="0" width="2" height="140" fill="rgba(0,0,0,0.07)"/>
             </g>
-            <!-- v-collar -->
-            <path d="M43,24 L50,34 L57,24" stroke="#d12030" stroke-width="2.5" fill="none" stroke-linejoin="round"/>
+            <!-- cuello redondo -->
+            <ellipse cx="60" cy="10" rx="11" ry="6" fill="none" stroke="#c8c8c8" stroke-width="2.5"/>
+            <!-- escudo pequeño en el pecho izquierdo -->
+            <g transform="translate(35,50) scale(0.28)">
+              <!-- escudo Alumni -->
+              <path d="M50,0 C50,0 95,8 100,55 C105,90 80,118 50,128 C20,118 -5,90 0,55 C5,8 50,0 50,0Z" fill="#d12030" stroke="#111" stroke-width="3"/>
+              <rect x="43" y="0" width="14" height="128" fill="white"/>
+              <!-- letras AA en negro -->
+              <text x="50" y="82" text-anchor="middle" font-family="Arial Black,sans-serif" font-weight="900" font-size="48" fill="#111" letter-spacing="-4">AA</text>
+            </g>
           </svg>
         </div>
       </div>
