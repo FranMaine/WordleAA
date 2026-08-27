@@ -219,6 +219,7 @@
     <div class="message" id="message" aria-live="polite"></div>
     <div class="hints" id="hints" aria-live="polite"></div>
     <div class="board" id="board"></div>
+    <input id="mobileInput" inputmode="text" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false" aria-hidden="true" tabindex="-1" style="position:absolute;opacity:0;width:1px;height:1px;pointer-events:none;">
   </main>
 
   <section class="keyboard" id="keyboard" aria-label="Teclado"></section>
@@ -1307,6 +1308,28 @@
     if (e.key === "Backspace") return handleKey("Backspace");
     const k = normalize(e.key || "");
     if (/^[A-ZÑ]$/.test(k) && k.length === 1) handleKey(k);
+  });
+
+  // Mobile keyboard support
+  const mobileInput = document.getElementById("mobileInput");
+  const boardEl = document.getElementById("board");
+  function focusMobileInput() {
+    if (finished || !target) return;
+    mobileInput.value = "";
+    mobileInput.focus();
+  }
+  boardEl.addEventListener("click", focusMobileInput);
+  boardEl.addEventListener("touchstart", function(e) { e.preventDefault(); focusMobileInput(); }, { passive: false });
+  mobileInput.addEventListener("input", function() {
+    const val = mobileInput.value;
+    mobileInput.value = "";
+    if (!val) return;
+    const k = normalize(val.slice(-1).toUpperCase());
+    if (/^[A-ZÑ]$/.test(k)) handleKey(k);
+  });
+  mobileInput.addEventListener("keydown", function(e) {
+    if (e.key === "Enter") { e.preventDefault(); handleKey("Enter"); }
+    if (e.key === "Backspace") { e.preventDefault(); handleKey("Backspace"); }
   });
 
   function evaluate(guess, answer) {
