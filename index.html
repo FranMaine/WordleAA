@@ -225,11 +225,20 @@
 
   <div class="reveal-backdrop" id="revealBackdrop" hidden></div>
   <section class="reveal-card" id="revealCard" hidden>
-    <div class="eyebrow" id="revealEyebrow">Adivinaste</div>
-    <h3 id="revealName">—</h3>
-    <div class="meta" id="revealMeta">—</div>
-    <div class="reveal-history" id="revealHistory"></div>
-    <div class="reveal-actions">
+    <div class="modal-header" style="margin-bottom:4px;">
+      <div>
+        <div class="eyebrow" id="revealEyebrow" style="margin-bottom:4px;">Adivinaste</div>
+        <h3 id="revealName" style="font-size:1.4rem;color:var(--red);margin:0;">—</h3>
+        <div class="meta" id="revealMeta" style="font-size:0.85rem;color:var(--subtext);margin-top:2px;">—</div>
+      </div>
+      <button class="modal-close" id="revealClose" aria-label="Cerrar">✕</button>
+    </div>
+    <div class="modal-history-grid" id="revealHistory"></div>
+    <div class="modal-section-label">Distribución de intentos</div>
+    <div class="dist-grid" id="revealDist"></div>
+    <div class="modal-section-label" id="revealCatsLabel" style="display:none">Tus mejores categorías</div>
+    <div class="cats-list" id="revealCats"></div>
+    <div class="reveal-actions" style="margin-top:8px;">
       <button class="btn primary" id="playAgainBtn">Jugar de nuevo</button>
       <button class="btn ghost" id="changeTeamBtn">Cambiar categoría</button>
       <button class="btn ghost" id="shareBtn">Compartir resultado</button>
@@ -1353,16 +1362,48 @@
     revealMeta.textContent = target.pos + " — " + catDisplay;
     shareBox.dataset.visible = "false";
     shareBox.textContent = buildShareText(won, attempts);
-    // modal is fixed/centered — no scrollIntoView needed
+
     const h = recordResult(won, attempts, target.primaryCat);
+    const pct = h.played > 0 ? Math.round((h.won || 0) / h.played * 100) : 0;
+
+    // Stats grid (igual que modal)
     const histEl = document.getElementById("revealHistory");
     if (histEl) {
-      const pct = h.played > 0 ? Math.round((h.won || 0) / h.played * 100) : 0;
       histEl.innerHTML =
-        "<div class='rh-item'><div class='rh-num'>" + h.played + "</div><div class='rh-lbl'>Partidas</div></div>" +
-        "<div class='rh-item'><div class='rh-num'>" + pct + "%</div><div class='rh-lbl'>Victorias</div></div>" +
-        "<div class='rh-item'><div class='rh-num'>" + (h.streak || 0) + "</div><div class='rh-lbl'>Racha</div></div>" +
-        "<div class='rh-item'><div class='rh-num'>" + (h.best || 0) + "</div><div class='rh-lbl'>Mejor racha</div></div>";
+        "<div class='mh-item'><div class='mh-num'>" + (h.played||0) + "</div><div class='mh-lbl'>Partidas</div></div>" +
+        "<div class='mh-item'><div class='mh-num'>" + pct + "%</div><div class='mh-lbl'>Victorias</div></div>" +
+        "<div class='mh-item'><div class='mh-num'>" + (h.streak||0) + "</div><div class='mh-lbl'>Racha</div></div>" +
+        "<div class='mh-item'><div class='mh-num'>" + (h.best||0) + "</div><div class='mh-lbl'>Mejor racha</div></div>";
+    }
+
+    // Distribución de intentos
+    const distEl = document.getElementById("revealDist");
+    if (distEl) {
+      const dist = h.dist || {};
+      const maxVal = Math.max(1, ...Object.values(dist));
+      distEl.innerHTML = "";
+      for (var i = 1; i <= 6; i++) {
+        const v = dist[i] || 0;
+        const w = Math.max(5, Math.round(v / maxVal * 100));
+        const row = document.createElement("div"); row.className = "dist-row";
+        row.innerHTML = "<span class='dist-num'>" + i + "</span><div class='dist-bar-wrap'><div class='dist-bar' style='width:" + w + "%'>" + v + "</div></div>";
+        distEl.appendChild(row);
+      }
+    }
+
+    // Mejores categorías
+    const cats = h.cats || {};
+    const catEntries = Object.entries(cats).sort(function(a,b){ return b[1]-a[1]; }).slice(0, 6);
+    const revealCatsLabel = document.getElementById("revealCatsLabel");
+    const revealCatsEl = document.getElementById("revealCats");
+    if (catEntries.length > 0) {
+      revealCatsLabel.style.display = "";
+      revealCatsEl.innerHTML = catEntries.map(function(e) {
+        return "<div class='cats-row'><span class='cats-name'>" + (CAT_LABEL[e[0]] || e[0]) + "</span><span class='cats-wins'>" + e[1] + " ✓</span></div>";
+      }).join("");
+    } else {
+      revealCatsLabel.style.display = "none";
+      revealCatsEl.innerHTML = "";
     }
   }
 
@@ -1377,6 +1418,7 @@
   }
 
   function closeReveal() { revealCard.hidden = true; revealBackdrop.hidden = true; }
+  document.getElementById("revealClose").addEventListener("click", closeReveal);
   revealBackdrop.addEventListener("click", closeReveal);
   document.addEventListener("keydown", function(e) { if (e.key === "Escape" && !revealCard.hidden) closeReveal(); });
   document.getElementById("playAgainBtn").addEventListener("click", startGame);
