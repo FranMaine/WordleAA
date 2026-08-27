@@ -312,20 +312,37 @@
     "ISLAS CASARES":"ISLA CASARES","ISLA CACERES":"ISLA CASARES",
     "GONZALES":"GONZALEZ","WAGENER":"WAGNER","OTTONDO":"OTONDO",
     "CARIDDI":"CARIDI","CARRENO":"CARREÑO","CELA":"CELAA",
-    "LOPEZ CABEZA":"LOPEZ CABEZAS","BENITEZ MACHUCA":"BENITEZ",
+    "LOPEZ CABEZA":"CABEZAS","LOPEZ CABEZAS":"CABEZAS","BENITEZ MACHUCA":"BENITEZ",
     "DE SANTACRUZ":"SANTACRUZ",
     "GUEVARA":"GEBARA","CUEVAS":"CUEVA","LUCCINI":"LUCINI"
   };
-  // ── Corrección de apodos/nicknames a nombres reales ──
+  // ── Corrección de apodos/nicknames a nombres reales (para deduplicar) ──
   const FIRST_FIXES = {
     "Agos":"Agostino","Joaco":"Joaquin","Rafa":"Rafael","Coco":"Diogenes",
     "Facu":"Facundo","Gonza":"Gonzalo","Nacho":"Ignacio","Colo":"Santiago",
     "Pancho":"Francisco","Pela":"Manuel","Perdo":"Pedro","Chesco":"Francisco",
     "Fran":"Francisco","Valen":"Valentin","Valentino":"Valentin","Fabriccio":"Fabricio",
     "Dyllan":"Dylan","Aleja":"Alejo","Agus":"Agustin","Ticiano":"Tiziano","Fantastico":"Facundo",
-    "Wlado":"Wladimir","Joaco":"Joaquin","Tiger":"Pedro","Thiago":"Tiago",
-    "Corcho":"Santiago","Teo":"Mateo","Emi":"Emiliano","Coco":"Diogenes",
-    "Pancho":"Francisco","Manolo":"Manuel","Lisandro":"Leandro"
+    "Wlado":"Wladimir","Tiger":"Pedro","Thiago":"Tiago",
+    "Corcho":"Santiago","Teo":"Teo","Emi":"Emiliano",
+    "Manolo":"Manuel","Lisandro":"Lisandro"
+  };
+  // ── Apodos para mostrar en la reveal card ──
+  const NICKS = {
+    "ALMADA":"Cumpa","ALZUGARAY":"Chango","ANDERSON":"Jarra",
+    "BARRAL":"Tato","BIVORT":"Chancha","BRUNA":"Mendo",
+    "CAFONCELLI":"Chiri","CARIDI":"Pampa","CARREÑO":"Samoa",
+    "CLARET":"Gopa","COSTA":"Pomelo","DELCARRIL":"Chancho",
+    "DEVOTO":"Coco","DIARBEKIRIAN":"Abuelo","DILLON":"Baby",
+    "DOMECQ":"Morsa","FAUVE":"Tatan","FERREIRO":"Chesco",
+    "FILGUEIRA":"Sapo","FRAGA":"Colo","GARCIA":"Tecla",
+    "GIRINI":"Tiger","GONZALEZ":"Rete","ISLA CASARES":"Manolo",
+    "IZE":"Chucho","KELLY":"Parri","LAMELAS":"Pollo",
+    "LUCINI":"Corcho","MACIEL":"Jacha","MALLEA":"Toro",
+    "MENDONCA":"Iño","MILTHALER":"Chileno","MUGHERLI":"EntreRíos",
+    "OLMOS":"Tucu","ORMEÑO":"Chori","ROSAS":"Panchi",
+    "SANCHEZ":"Chipi","SANTACRUZ":"Uru","SEGURA":"Lisan",
+    "SEVERO":"TJ","VARELA":"Patron","VIDAL":"Batu","VIOLA":"Poti"
   };
   function fixPlayer(p) {
     const fl = LAST_FIXES[p.last] || p.last;
@@ -856,7 +873,7 @@
       { first: "Valentin", last: "BONATO", pos: "Centro", primaryCat: "PRE E" },
       { first: "Matias", last: "BONAZZOLA", pos: "Apertura", primaryCat: "PRE F" },
       { first: "Dylan", last: "BUSTAMANTE", pos: "Pilar", primaryCat: "PRE F" },
-      { first: "Lopez", last: "CABEZAS", pos: "Octavo", primaryCat: "PRE F" },
+      { first: "Santiago", last: "CABEZAS", pos: "Octavo", primaryCat: "PRE F" },
       { first: "Ignacio", last: "CABRAL", pos: "Hooker", primaryCat: "PRE F" },
       { first: "Agus", last: "CABRAL", pos: "Wing", primaryCat: "PRE F" },
       { first: "Agustin", last: "CABRAL", pos: "Wing", primaryCat: "PRE G" },
@@ -1375,7 +1392,7 @@
     revealBackdrop.hidden = false;
     revealCard.hidden = false;
     revealEyebrow.textContent = won ? "¡Lo adivinaste en " + attempts + "/" + MAX_ATTEMPTS + "!" : "Se te acabaron los intentos";
-    revealName.textContent = target.first + " " + target.last;
+    revealName.textContent = (NICKS[target.last] || target.first) + " " + target.last;
     let catDisplay;
     if (currentTeamId === "club") {
       const cat = target.primaryCat || "";
