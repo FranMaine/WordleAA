@@ -1066,9 +1066,13 @@
     }).join("");
   }
 
+  const ALLOW_MULTI = new Set(["BIVORT","SABATO"]);
   function uniqueByLast(arr) {
     const seen = new Set();
-    return arr.map(fixPlayer).filter(p => { const k = p.first + "|" + p.last; if (seen.has(k)) return false; seen.add(k); return true; });
+    return arr.map(fixPlayer).filter(p => {
+      const k = ALLOW_MULTI.has(p.last) ? (p.first + "|" + p.last) : p.last;
+      if (seen.has(k)) return false; seen.add(k); return true;
+    });
   }
 
   function poolFor(teamId) {
