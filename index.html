@@ -233,6 +233,7 @@
       <button class="btn primary" id="playAgainBtn">Jugar de nuevo</button>
       <button class="btn ghost" id="changeTeamBtn">Cambiar categoría</button>
       <button class="btn ghost" id="shareBtn">Compartir resultado</button>
+      <button class="btn ghost" id="resetStatsBtnReveal" style="color:var(--subtext);font-size:0.78rem;">Borrar mis estadísticas</button>
     </div>
     <div class="share-box" id="shareBox"></div>
   </section>
@@ -272,6 +273,9 @@
       <div class="dist-grid" id="modalDist"></div>
       <div class="modal-section-label" id="modalCatsLabel" style="display:none">Tus mejores categorías</div>
       <div class="cats-list" id="modalCats"></div>
+      <div style="margin-top:18px;text-align:center;">
+        <button id="resetStatsBtnModal" style="background:transparent;border:1px solid var(--tile-border);color:var(--subtext);border-radius:4px;padding:6px 16px;font-size:0.75rem;letter-spacing:0.05em;cursor:pointer;">BORRAR MIS ESTADÍSTICAS</button>
+      </div>
     </div>
   </div>
 </div>
@@ -1404,12 +1408,16 @@
   if (kickerEl) kickerEl.textContent = SEASON_LABEL;
   buildDropdown(); buildStats(); startGame();
 
-  document.getElementById("resetStatsBtn").addEventListener("click", function() {
+  function resetStats() {
     if (confirm("¿Borrar todas tus estadísticas? Esta acción no se puede deshacer.")) {
       try { localStorage.removeItem("alumni-wordle-h"); } catch(e) {}
       buildStats();
+      populateModal();
       alert("Estadísticas borradas.");
     }
-  });
+  }
+  document.getElementById("resetStatsBtn").addEventListener("click", resetStats);
+  document.getElementById("resetStatsBtnModal").addEventListener("click", resetStats);
+  document.getElementById("resetStatsBtnReveal").addEventListener("click", resetStats);
 })();
 </script>
