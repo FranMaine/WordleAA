@@ -241,10 +241,8 @@
     <div class="reveal-actions" style="margin-top:8px;">
       <button class="btn primary" id="playAgainBtn">Jugar de nuevo</button>
       <button class="btn ghost" id="changeTeamBtn">Cambiar categoría</button>
-      <button class="btn ghost" id="shareBtn">Compartir resultado</button>
       <button class="btn ghost" id="resetStatsBtnReveal" style="color:var(--subtext);font-size:0.78rem;">Borrar mis estadísticas</button>
     </div>
-    <div class="share-box" id="shareBox"></div>
   </section>
 
   <section class="stats">
@@ -290,7 +288,7 @@
 (function () {
   "use strict";
 
-  const SEASON_LABEL = "Top 14 URBA 2026 · 191 jugadores";
+  const SEASON_LABEL = "Top 14 URBA 2026";
 
   const CAT_LABEL = {
     "PRIMERA":"Primera","INTER":"Inter","PRE A":"Pre A","PRE B":"Pre B","M22":"M22",
@@ -1015,7 +1013,6 @@
   const revealName = document.getElementById("revealName");
   const revealMeta = document.getElementById("revealMeta");
   const statsBody = document.getElementById("statsBody");
-  const shareBox = document.getElementById("shareBox");
   const hintsEl = document.getElementById("hints");
 
   /* ── localStorage history ─────────────────────────────── */
@@ -1091,6 +1088,13 @@
     if (el) el.textContent = clubCount;
     if (!statsBody) return;
 
+    const maxGames = Math.max(...TEAMS.map(function(t){ return t.games || 0; }));
+    const numCats = TEAMS.length;
+
+    // Actualizar SEASON_LABEL dinámicamente
+    const kickerEl = document.getElementById("seasonKicker");
+    if (kickerEl) kickerEl.textContent = "Top 14 URBA 2026 · " + clubCount + " jugadores";
+
     /* ── Category cards ── */
     statsBody.innerHTML = "";
     function goTo(id) {
@@ -1101,7 +1105,7 @@
     totalCard.innerHTML =
       "<div class='cat-card-label'>Todo el club</div>" +
       "<div class='cat-card-nums'><span class='cat-card-count'>" + clubCount + "</span><span class='cat-card-unit'>jugadores</span></div>" +
-      "<div class='cat-card-dates'>19 fechas · 10 categorías</div>";
+      "<div class='cat-card-dates'>" + maxGames + " fechas · " + numCats + " categorías</div>";
     totalCard.addEventListener("click", goTo("club"));
     statsBody.appendChild(totalCard);
     TEAMS.forEach(function(t) {
@@ -1136,8 +1140,8 @@
       "<div class='ff-item'><div class='ff-label'>Puesto más representado</div><div class='ff-value'>" + topPos[0] + "</div><div class='ff-sub'>" + topPos[1] + " jugadores</div></div>" +
       "<div class='ff-item'><div class='ff-label'>Apellido más largo</div><div class='ff-value' style='font-size:0.82rem;font-weight:700;font-family:Barlow,sans-serif'>" + longest + "</div><div class='ff-sub'>" + longest.replace(/ /g,"").length + " letras</div></div>" +
       "<div class='ff-item'><div class='ff-label'>Jugadores multifunción</div><div class='ff-value'>" + versatile + "</div><div class='ff-sub'>en 3 o más categorías</div></div>" +
-      "<div class='ff-item'><div class='ff-label'>Categorías</div><div class='ff-value'>10</div><div class='ff-sub'>de Pre G a Primera</div></div>" +
-      "<div class='ff-item'><div class='ff-label'>Temporada</div><div class='ff-value'>2026</div><div class='ff-sub'>Top 14 URBA · 19 fechas</div></div>";
+      "<div class='ff-item'><div class='ff-label'>Categorías</div><div class='ff-value'>" + numCats + "</div><div class='ff-sub'>de Pre G a Primera</div></div>" +
+      "<div class='ff-item'><div class='ff-label'>Temporada</div><div class='ff-value'>2026</div><div class='ff-sub'>Top 14 URBA · " + maxGames + " fechas</div></div>";
   }
 
   function populateModal() {
@@ -1189,7 +1193,6 @@
     finished = false; guesses = []; rowStates = []; current = ""; keyBestState = {};
     hintLetterIndex = -1;
     revealCard.hidden = true; revealBackdrop.hidden = true;
-    shareBox.dataset.visible = "false"; shareBox.textContent = "";
     setMessage(""); hintsEl.innerHTML = "";
     if (!target) { cols = 6; boardEl.innerHTML = ""; setMessage("Esta categoría no tiene jugadores."); renderKeyboard(); return; }
     targetNorm = normalize(target.last);
@@ -1360,9 +1363,6 @@
       catDisplay = team ? team.label : (CAT_LABEL[target.primaryCat||""] || target.primaryCat || "");
     }
     revealMeta.textContent = target.pos + " — " + catDisplay;
-    shareBox.dataset.visible = "false";
-    shareBox.textContent = buildShareText(won, attempts);
-
     const h = recordResult(won, attempts, target.primaryCat);
     const pct = h.played > 0 ? Math.round((h.won || 0) / h.played * 100) : 0;
 
@@ -1407,15 +1407,6 @@
     }
   }
 
-  function buildShareText(won, attempts) {
-    const selLabel = currentTeamId === "club" ? "Todo el club" : (TEAMS.find(t => t.id === currentTeamId) || {}).label;
-    const lines = ["Apellidos de Alumni — " + (selLabel||"") + " — " + (won ? attempts + "/" + MAX_ATTEMPTS : "X/" + MAX_ATTEMPTS)];
-    rowStates.forEach(states => {
-      const emoji = states.filter((s, i) => targetNorm[i] !== " ").map(s => s === "correct" ? "🟩" : s === "present" ? "🟨" : "⬛").join("");
-      lines.push(emoji);
-    });
-    return lines.join("\n");
-  }
 
   function closeReveal() { revealCard.hidden = true; revealBackdrop.hidden = true; }
   document.getElementById("revealClose").addEventListener("click", closeReveal);
@@ -1426,12 +1417,6 @@
     revealCard.hidden = true; revealBackdrop.hidden = true;
     teamSelectEl.scrollIntoView({ behavior: "smooth", block: "center" });
     setTimeout(function() { teamSelectEl.focus(); }, 350);
-  });
-  document.getElementById("shareBtn").addEventListener("click", async () => {
-    const won = guesses.length > 0 && current === "" && rowStates.length && guesses[guesses.length-1] === targetNorm;
-    const text = buildShareText(won, guesses.length);
-    try { await navigator.clipboard.writeText(text); shareBox.dataset.visible = "true"; setMessage("¡Copiado!"); }
-    catch { shareBox.dataset.visible = "true"; setMessage("Seleccioná el texto de abajo.", true); }
   });
 
   /* ── Stats modal ─────────────────────────────────────── */
