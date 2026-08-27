@@ -245,9 +245,6 @@
     </div>
     <div class="cats-grid" id="statsBody"></div>
     <div class="funfacts" id="funfactsEl"></div>
-    <div style="margin-top:20px;text-align:center;">
-      <button id="resetStatsBtn" style="background:transparent;border:1px solid var(--tile-border);color:var(--subtext);border-radius:4px;padding:7px 18px;font-size:0.78rem;letter-spacing:0.05em;cursor:pointer;" onmouseover="this.style.borderColor='var(--red)';this.style.color='var(--red)'" onmouseout="this.style.borderColor='var(--tile-border)';this.style.color='var(--subtext)'">BORRAR MIS ESTADÍSTICAS</button>
-    </div>
   </section>
 
   <footer class="note">
@@ -1416,7 +1413,6 @@
       alert("Estadísticas borradas.");
     }
   }
-  document.getElementById("resetStatsBtn").addEventListener("click", resetStats);
   document.getElementById("resetStatsBtnModal").addEventListener("click", resetStats);
   document.getElementById("resetStatsBtnReveal").addEventListener("click", resetStats);
 })();
