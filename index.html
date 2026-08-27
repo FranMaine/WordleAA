@@ -1304,6 +1304,7 @@
 
   document.addEventListener("keydown", (e) => {
     if (finished || !target) return;
+    if (document.activeElement === mobileInput) return; // mobileInput handles it
     if (e.key === "Enter") return handleKey("Enter");
     if (e.key === "Backspace") return handleKey("Backspace");
     const k = normalize(e.key || "");
@@ -1317,7 +1318,6 @@
     mobileInput.value = "";
     mobileInput.focus();
   }
-  boardEl.addEventListener("click", focusMobileInput);
   boardEl.addEventListener("touchstart", function(e) { e.preventDefault(); focusMobileInput(); }, { passive: false });
   mobileInput.addEventListener("input", function() {
     const val = mobileInput.value;
