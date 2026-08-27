@@ -147,7 +147,7 @@
   .cat-total-card .cat-card-unit, .cat-total-card .cat-card-dates { color: rgba(255,255,255,0.65); }
   .cat-total-card:hover { box-shadow: 0 6px 22px rgba(164,31,44,0.42); }
 
-  .funfacts { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .funfacts { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 24px; }
   @media (min-width: 460px) { .funfacts { grid-template-columns: repeat(3, 1fr); } }
   .ff-item { background: var(--card); border: 1px solid var(--tile-border); border-radius: 4px; padding: 12px; box-shadow: var(--shadow); }
   .ff-label { font-size: 0.62rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-soft); font-weight: 700; margin-bottom: 4px; }
@@ -244,6 +244,9 @@
     </div>
     <div class="cats-grid" id="statsBody"></div>
     <div class="funfacts" id="funfactsEl"></div>
+    <div style="margin-top:20px;text-align:center;">
+      <button id="resetStatsBtn" style="background:transparent;border:1px solid var(--tile-border);color:var(--subtext);border-radius:4px;padding:7px 18px;font-size:0.78rem;letter-spacing:0.05em;cursor:pointer;" onmouseover="this.style.borderColor='var(--red)';this.style.color='var(--red)'" onmouseout="this.style.borderColor='var(--tile-border)';this.style.color='var(--subtext)'">BORRAR MIS ESTADÍSTICAS</button>
+    </div>
   </section>
 
   <footer class="note">
@@ -1400,5 +1403,13 @@
   const kickerEl = document.getElementById("kicker");
   if (kickerEl) kickerEl.textContent = SEASON_LABEL;
   buildDropdown(); buildStats(); startGame();
+
+  document.getElementById("resetStatsBtn").addEventListener("click", function() {
+    if (confirm("¿Borrar todas tus estadísticas? Esta acción no se puede deshacer.")) {
+      try { localStorage.removeItem("alumni-wordle-h"); } catch(e) {}
+      buildStats();
+      alert("Estadísticas borradas.");
+    }
+  });
 })();
 </script>
