@@ -327,10 +327,10 @@
     "Corcho":"Santiago","Teo":"Teo","Emi":"Emiliano",
     "Manolo":"Manuel","Lisandro":"Lisandro"
   };
-  // ── Apodos para mostrar en la reveal card ──
+  // ── Apodos por apellido (jugadores con apellido único) ──
   const NICKS = {
     "ALMADA":"Cumpa","ALZUGARAY":"Chango","ANDERSON":"Jarra",
-    "BARRAL":"Tato","BIVORT":"Chancha","BRUNA":"Mendo",
+    "BARRAL":"Tato","BRUNA":"Mendo",
     "CAFONCELLI":"Chiri","CARIDI":"Pampa","CARREÑO":"Samoa",
     "CLARET":"Gopa","COSTA":"Pomelo","DELCARRIL":"Chancho",
     "DEVOTO":"Coco","DIARBEKIRIAN":"Abuelo","DILLON":"Baby",
@@ -343,6 +343,10 @@
     "OLMOS":"Tucu","ORMEÑO":"Chori","ROSAS":"Panchi",
     "SANCHEZ":"Chipi","SANTACRUZ":"Uru","SEGURA":"Lisan",
     "SEVERO":"TJ","VARELA":"Patron","VIDAL":"Batu","VIOLA":"Poti"
+  };
+  // ── Apodos por nombre+apellido (cuando hay varios con el mismo apellido) ──
+  const NICKS_FULL = {
+    "Tomas|BIVORT":"Chancha","Jose|BIVORT":"Pepino"
   };
   function fixPlayer(p) {
     const fl = LAST_FIXES[p.last] || p.last;
@@ -518,7 +522,6 @@
       { first: "Nahuel", last: "BENETTI", pos: "Pilar", primaryCat: "PRE B" },
       { first: "Valentin", last: "BERRETA", pos: "Pilar", primaryCat: "PRE B" },
       { first: "Juan Marcos", last: "BERRETA", pos: "Full back", primaryCat: "PRE B" },
-      { first: "Jose", last: "BIVORT", pos: "Hooker", primaryCat: "PRE B" },
       { first: "Thiago", last: "BOLAN", pos: "Centro", primaryCat: "PRE B" },
       { first: "Valentin", last: "BOURQUIN", pos: "Centro", primaryCat: "PRE D" },
       { first: "Ciro", last: "CAFONCELLI", pos: "Centro", primaryCat: "PRE C" },
@@ -578,8 +581,7 @@
       { first: "Leandro", last: "ALZUGARAY", pos: "Segunda línea", primaryCat: "M22" },
       { first: "Facundo", last: "ASI", pos: "Octavo", primaryCat: "PRE B" },
       { first: "Valentin", last: "BERRETA", pos: "Pilar", primaryCat: "PRE B" },
-      { first: "Jose Maria", last: "BIVORT", pos: "Hooker", primaryCat: "M22" },
-      { first: "Jose", last: "BIVORT", pos: "Hooker", primaryCat: "PRE B" },
+      { first: "Jose", last: "BIVORT", pos: "Hooker", primaryCat: "M22" },
       { first: "Tiago", last: "BOLAN", pos: "Centro", primaryCat: "M22" },
       { first: "Emiliano", last: "BRUNA", pos: "Centro", primaryCat: "PRE D" },
       { first: "Mateo", last: "CAMPBELL", pos: "Apertura", primaryCat: "PRE B" },
@@ -1066,7 +1068,7 @@
 
   function uniqueByLast(arr) {
     const seen = new Set();
-    return arr.map(fixPlayer).filter(p => { const k = p.last; if (seen.has(k)) return false; seen.add(k); return true; });
+    return arr.map(fixPlayer).filter(p => { const k = p.first + "|" + p.last; if (seen.has(k)) return false; seen.add(k); return true; });
   }
 
   function poolFor(teamId) {
@@ -1392,7 +1394,8 @@
     revealBackdrop.hidden = false;
     revealCard.hidden = false;
     revealEyebrow.textContent = won ? "¡Lo adivinaste en " + attempts + "/" + MAX_ATTEMPTS + "!" : "Se te acabaron los intentos";
-    revealName.textContent = (NICKS[target.last] || target.first) + " " + target.last;
+    const _nick = NICKS_FULL[target.first+"|"+target.last] !== undefined ? NICKS_FULL[target.first+"|"+target.last] : NICKS[target.last];
+    revealName.textContent = (_nick || target.first) + " " + target.last;
     let catDisplay;
     if (currentTeamId === "club") {
       const cat = target.primaryCat || "";
