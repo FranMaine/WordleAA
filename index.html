@@ -1125,8 +1125,8 @@
     const ffEl = document.getElementById("funfactsEl");
     if (!ffEl) return;
     const firstCounts = {};
-    // Usar datos corregidos (fixPlayer) para los fun facts
-    TEAMS.forEach(function(t) { t.players.forEach(function(p) { const fp = fixPlayer(p); const n = fp.first.split(" ")[0]; firstCounts[n] = (firstCounts[n]||0)+1; }); });
+    // Contar sobre el pool deduplicado por apellido (no sobre el dataset bruto)
+    poolFor("club").forEach(function(p) { const n = p.first.split(" ")[0]; firstCounts[n] = (firstCounts[n]||0)+1; });
     const topFirst = Object.entries(firstCounts).sort(function(a,b){ return b[1]-a[1]; })[0] || ["—",0];
     const posCounts = {};
     poolFor("club").forEach(function(p){ posCounts[p.pos] = (posCounts[p.pos]||0)+1; });
