@@ -83,6 +83,8 @@
   .tile[data-state="space"] { background: transparent; border: none; border-bottom: 2px solid var(--tile-border); }
   .tile[data-flip="true"] { animation: flip 0.5s ease forwards; }
   @keyframes flip { 0% { transform: rotateX(0deg); } 50% { transform: rotateX(90deg); } 100% { transform: rotateX(0deg); } }
+  @keyframes pop { 0% { transform: scale(1); } 50% { transform: scale(1.12); } 100% { transform: scale(1); } }
+  .tile[data-pop="true"] { animation: pop 0.1s ease; }
   .board[data-shake="true"] { animation: shake 0.4s; }
   @keyframes shake { 10%,90% { transform: translateX(-2px); } 20%,80% { transform: translateX(4px); } 30%,50%,70% { transform: translateX(-8px); } 40%,60% { transform: translateX(8px); } }
   @media (prefers-reduced-motion: reduce) { .tile, .board { animation: none !important; transition: none !important; } }
@@ -1339,7 +1341,14 @@
     if (finished || !target) return;
     if (key === "Enter") return submitGuess();
     if (key === "Backspace") { current = current.slice(0, -1); renderBoard(); return; }
-    if (/^[A-ZÑ]$/.test(key) && current.length < editableIndices.length) { current += key; renderBoard(); }
+    if (/^[A-ZÑ]$/.test(key) && current.length < editableIndices.length) {
+      current += key; renderBoard();
+      // Pop animation en la tile recién escrita
+      const rowStart = guesses.length * cols;
+      const writtenPos = editableIndices[current.length - 1];
+      const tile = boardEl.children[rowStart + writtenPos];
+      if (tile) { tile.dataset.pop = "true"; setTimeout(() => { tile.dataset.pop = "false"; }, 100); }
+    }
   }
 
   document.addEventListener("keydown", (e) => {
@@ -1395,6 +1404,12 @@
     }
     const fullGuess = expandCurrent();
     const states = evaluate(fullGuess, targetNorm);
+
+    // Capturar tiles de la fila actual ANTES de re-renderizar
+    const rowIndex = guesses.length;
+    const allTiles = Array.from(boardEl.children);
+    const rowTiles = allTiles.slice(rowIndex * cols, (rowIndex + 1) * cols);
+
     guesses.push(fullGuess); rowStates.push(states);
     states.forEach((s, i) => {
       const letter = fullGuess[i];
@@ -1404,10 +1419,33 @@
     });
     const won = fullGuess === targetNorm;
     current = "";
-    renderBoard(); renderKeyboard();
-    if (won) { finished = true; setMessage(""); hintsEl.innerHTML = ""; showReveal(true, guesses.length); }
-    else if (guesses.length >= MAX_ATTEMPTS) { finished = true; setMessage(""); hintsEl.innerHTML = ""; showReveal(false, MAX_ATTEMPTS); }
-    else { setMessage(""); renderHints(); }
+
+    // Animación flip tile a tile
+    const FLIP_HALF = 180;   // ms por mitad del flip
+    const TILE_DELAY = 90;   // ms entre tiles
+    let tileIdx = 0;
+    rowTiles.forEach((tile, i) => {
+      if (tile.dataset.state === "space") return;
+      const delay = tileIdx * TILE_DELAY;
+      tileIdx++;
+      setTimeout(() => {
+        tile.style.transition = "transform " + FLIP_HALF + "ms ease-in";
+        tile.style.transform = "rotateX(-90deg)";
+        setTimeout(() => {
+          tile.dataset.state = states[i];
+          tile.style.transition = "transform " + FLIP_HALF + "ms ease-out";
+          tile.style.transform = "rotateX(0deg)";
+        }, FLIP_HALF);
+      }, delay);
+    });
+
+    const totalAnim = (tileIdx - 1) * TILE_DELAY + FLIP_HALF * 2;
+    setTimeout(() => {
+      renderBoard(); renderKeyboard();
+      if (won) { finished = true; setMessage(""); hintsEl.innerHTML = ""; showReveal(true, guesses.length); }
+      else if (guesses.length >= MAX_ATTEMPTS) { finished = true; setMessage(""); hintsEl.innerHTML = ""; showReveal(false, MAX_ATTEMPTS); }
+      else { setMessage(""); renderHints(); }
+    }, totalAnim + 40);
   }
 
   const revealBackdrop = document.getElementById("revealBackdrop");
