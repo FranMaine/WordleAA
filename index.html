@@ -313,7 +313,7 @@
     "GONZALES":"GONZALEZ","WAGENER":"WAGNER","OTTONDO":"OTONDO",
     "CARIDDI":"CARIDI","CARRENO":"CARREÑO","CELA":"CELAA",
     "LOPEZ CABEZA":"CABEZAS","LOPEZ CABEZAS":"CABEZAS","BENITEZ MACHUCA":"BENITEZ",
-    "DE SANTACRUZ":"SANTACRUZ",
+    "DE SANTACRUZ":"SANTACRUZ","DONMANOVICH":"DOMNANOVICH",
     "GUEVARA":"GEBARA","CUEVAS":"CUEVA","LUCCINI":"LUCINI"
   };
   // ── Corrección de apodos/nicknames a nombres reales (para deduplicar) ──
@@ -323,31 +323,40 @@
     "Pancho":"Francisco","Pela":"Manuel","Perdo":"Pedro","Chesco":"Francisco",
     "Fran":"Francisco","Valen":"Valentin","Valentino":"Valentin","Fabriccio":"Fabricio",
     "Dyllan":"Dylan","Aleja":"Alejo","Agus":"Agustin","Ticiano":"Tiziano","Fantastico":"Facundo",
-    "Wlado":"Wladimir","Tiger":"Pedro","Thiago":"Tiago",
+    "Wlado":"Wladimir","Tiger":"Pedro","Thiago":"Tiago","Valdimir":"Vladimir",
     "Corcho":"Santiago","Teo":"Teo","Emi":"Emiliano",
     "Manolo":"Manuel","Lisandro":"Lisandro"
   };
-  // ── Apodos por apellido (jugadores con apellido único) ──
+  // ── Apodos por apellido (jugadores con apellido único en el pool) ──
   const NICKS = {
     "ALMADA":"Cumpa","ALZUGARAY":"Chango","ANDERSON":"Jarra",
     "BARRAL":"Tato","BRUNA":"Mendo",
     "CAFONCELLI":"Chiri","CARIDI":"Pampa","CARREÑO":"Samoa",
     "CLARET":"Gopa","COSTA":"Pomelo","DELCARRIL":"Chancho",
-    "DEVOTO":"Coco","DIARBEKIRIAN":"Abuelo","DILLON":"Baby",
+    "DIARBEKIRIAN":"Abuelo","DILLON":"Baby",
     "DOMECQ":"Morsa","FAUVE":"Tatan","FERREIRO":"Chesco",
-    "FILGUEIRA":"Sapo","FRAGA":"Colo","GARCIA":"Tecla",
-    "GIRINI":"Tiger","GONZALEZ":"Rete","ISLA CASARES":"Manolo",
+    "FILGUEIRA":"Sapo","FRAGA":"Colo",
+    "GIRINI":"Tiger","ISLA CASARES":"Manolo",
     "IZE":"Chucho","KELLY":"Parri","LAMELAS":"Pollo",
-    "LUCINI":"Corcho","MACIEL":"Jacha","MALLEA":"Toro",
+    "MACIEL":"Jacha","MALLEA":"Toro",
     "MENDONCA":"Iño","MILTHALER":"Chileno","MUGHERLI":"EntreRíos",
     "OLMOS":"Tucu","ORMEÑO":"Chori","ROSAS":"Panchi",
-    "SANCHEZ":"Chipi","SANTACRUZ":"Uru","SEGURA":"Lisan",
-    "SEVERO":"TJ","VARELA":"Patron","VIDAL":"Batu","VIOLA":"Poti"
+    "SANCHEZ":"Chipi","SANTACRUZ":"Uru",
+    "SEVERO":"TJ","VIDAL":"Batu","VIOLA":"Poti"
   };
   // ── Apodos por nombre+apellido (cuando hay varios con el mismo apellido) ──
   const NICKS_FULL = {
-    "Tomas|BIVORT":"Chancha","Jose|BIVORT":"Pepino"
+    "Tomas|BIVORT":"Chancha","Jose|BIVORT":"Pepino",
+    "Diogenes|DEVOTO":"Coco","Santos|GARCIA":"Tecla",
+    "Santiago|GONZALEZ":"Rete","Lisandro|SEGURA":"Lisan",
+    "Juan Manuel|VARELA":"Patron"
   };
+  // ── Jugadores excluidos del pool (mismo jugador con nombre distinto o descartados) ──
+  const EXCLUDE = new Set([
+    "Patricio|ANDERSON","Pampa|CARIDI","Santiago|LUCINI",
+    "Alejandro|WILLIAMS","Marcos|BERRETA","Juan Martin|MAINE",
+    "Juan|VARELA","Facundo|VARELA"
+  ]);
   function fixPlayer(p) {
     const fl = LAST_FIXES[p.last] || p.last;
     const ff = FIRST_FIXES[p.first] || p.first;
@@ -1066,11 +1075,19 @@
     }).join("");
   }
 
-  const ALLOW_MULTI = new Set(["BIVORT","SABATO"]);
+  const ALLOW_MULTI = new Set([
+    "ALDUNCIN","BERRETA","BIVORT","BOTTONI","CABRAL","CANZANI",
+    "CASANOVA","CONTE","CUBILLA","CUEVA","DEVOTO","DIAZLUZZI",
+    "DOMNANOVICH","FUENTES","GARCIA","GONZALEZ","GUERRERO",
+    "LANUSSE","MAINE","MARTINEZ","ORTIZ","RIFNER","SABATO",
+    "SEGURA","TESTONI","VARELA","VASSOLO","VENIER","WAGNER","WILLIAMS"
+  ]);
   function uniqueByLast(arr) {
     const seen = new Set();
     return arr.map(fixPlayer).filter(p => {
-      const k = ALLOW_MULTI.has(p.last) ? (p.first + "|" + p.last) : p.last;
+      const fk = p.first + "|" + p.last;
+      if (EXCLUDE.has(fk)) return false;
+      const k = ALLOW_MULTI.has(p.last) ? fk : p.last;
       if (seen.has(k)) return false; seen.add(k); return true;
     });
   }
